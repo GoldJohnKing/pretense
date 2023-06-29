@@ -7894,12 +7894,12 @@ do
             end
 
             if not exists then
-                if not self.param.firstFailure then
-                    self.param.firstFailure = timer.getAbsTime()
+                if not self.firstFailure then
+                    self.firstFailure = timer.getAbsTime()
                 end
             end
 
-            if timer.getAbsTime() - self.firstFailure > 1*60 then
+            if self.firstFailure and (timer.getAbsTime() - self.firstFailure > 1*60) then
                 self.isFailed = true
                 self.mission.failureReason = 'Structure was destoyed by someone else.'
                 return true
