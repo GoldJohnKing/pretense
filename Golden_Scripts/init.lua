@@ -30,11 +30,11 @@ do
 		units = { 
 			"M1045 HMMWV TOW",
 			"Soldier stinger",
-			"Soldier M4",
-			"Soldier M4",
-			"Soldier M4",
-			"Soldier M4",
-			"Soldier M4",
+			"Soldier M4 GRG",
+			"Soldier M4 GRG",
+			"Soldier M4 GRG",
+			"Soldier M4 GRG",
+			"Soldier M4 GRG",
 			"M1043 HMMWV Armament"
 		},
 		skill = "Excellent",
@@ -55,9 +55,9 @@ do
 
 	TemplateDB.templates["defense-blue"] = {
 		units = { 
-			"Soldier M4",
-			"Soldier M4",
-			"Soldier M4",
+			"Soldier M4 GRG",
+			"Soldier M4 GRG",
+			"Soldier M4 GRG",
 			"Soldier RPG",
 			"Soldier stinger",
 		},
