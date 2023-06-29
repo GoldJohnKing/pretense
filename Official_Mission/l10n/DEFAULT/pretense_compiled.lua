@@ -5819,6 +5819,8 @@ do
 
     function PlayerTracker:addRankRewards(player, unit, isTemp)
         local rank = self:getPlayerRank(player)
+        if not rank then return end
+
         local cmdChance = rank.cmdChance
         if cmdChance > 0 then 
             local die = math.random()
@@ -5889,6 +5891,7 @@ do
 				local player = event.initiator:getPlayerName()
 				if player then
                     local rank = context:getPlayerRank(player)
+                    if not rank then return end
 
                     if rank.cmdChance > 0 then
                         local groupid = event.initiator:getGroup():getID()
