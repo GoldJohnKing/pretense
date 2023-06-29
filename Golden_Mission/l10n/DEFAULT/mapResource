@@ -1,0 +1,11 @@
+mapResource = 
+{
+    ["ResKey_Action_37"] = "endsong.ogg",
+    ["ResKey_Action_41"] = "endsong2.ogg",
+    ["ResKey_Action_34"] = "success.ogg",
+    ["init"] = "Load_Scripts.lua",
+    ["ResKey_Action_35"] = "fail.ogg",
+    ["ResKey_Action_40"] = "endscreen2.jpg",
+    ["ResKey_Action_36"] = "endscreen.jpg",
+    ["ResKey_ImageBriefing_14"] = "cover_small.jpg",
+} -- end of mapResource

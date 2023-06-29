@@ -1,0 +1,16 @@
+dictionary = 
+{
+    ["DictKey_descriptionText_1"] = "A war errupted in the Caucasus region, and mercenaries were brought in to help the war effort.\
+\
+User manual: github.com/Dzsek/pretense",
+    ["DictKey_descriptionBlueTask_3"] = "You are mercenary in the midst of a war happening around you.\
+\
+Complete tasks from the mission board, to gain experience and rise through the ranks.",
+    ["DictKey_ActionText_39"] = "return BattlefieldManager.noBlueZones",
+    ["DictKey_descriptionNeutralsTask_4"] = "",
+    ["DictKey_sortie_5"] = "",
+    ["DictKey_descriptionRedTask_2"] = "",
+    ["DictKey_ActionText_19"] = "",
+    ["DictKey_ActionText_28"] = "return false",
+    ["DictKey_ActionText_38"] = "return BattlefieldManager.noRedZones",
+} -- end of dictionary
