@@ -658,7 +658,6 @@ do -- the main scope
             ["FARP"] = "farps",
             ["Fueltank"] = "fueltank_cargo",
             ["Gate"] = "gate",
-            ["FARP Fuel Depot"] = "gsm rus",
             ["Armed house"] = "home1_a",
             ["FARP Command Post"] = "kp-ug",
             ["Watch Tower Armed"] = "ohr-vyshka",
@@ -667,7 +666,6 @@ do -- the main scope
             ["Pipes big"] = "pipes_big_cargo",
             ["Oil platform"] = "plavbaza",
             ["Tetrapod"] = "tetrapod_cargo",
-            ["Fuel tank"] = "toplivo",
             ["Trunks long"] = "trunks_long_cargo",
             ["Trunks small"] = "trunks_small_cargo",
             ["Passenger liner"] = "yastrebow",
@@ -1350,7 +1348,11 @@ do -- the main scope
 
 				else	--attempt to determine if static object...
 					--log:info('object not found in alive units or old alive units')
-					local pos = Object.getPosition(val.object)
+					local pos = nil
+					if Object.isExist(val.object) then
+						pos = Object.getPosition(val.object)
+					end
+					
 					if pos then
 						local static_found = false
 						for ind, static in pairs(mist.DBs.unitsByCat.static) do
