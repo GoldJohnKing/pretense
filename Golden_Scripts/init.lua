@@ -1233,7 +1233,7 @@ zones.kobuleti:defineUpgrades({
                 presets.missions.attack.bai:extend({name='kobuleti-cas-blue', altitude=10000, expend=AI.Task.WeaponExpend.ONE}),
                 presets.missions.attack.strike:extend({name='kobuleti-strike-blue', altitude=20000, expend=AI.Task.WeaponExpend.TWO}),
                 presets.missions.patrol.aircraft:extend({name='kobuleti-patrol-blue', altitude=25000, range=25}),
-                presets.missions.support.awacs:extend({name='kobuleti-awacs-blue', altitude=30000, freq=158.5}), -- Edited, lower radio frequency so that Russian aircraft can connect, default = 258.5
+                presets.missions.support.awacs:extend({name='kobuleti-awacs-blue', altitude=30000, freq=258.5}),
                 presets.missions.support.tanker:extend({name='kobuleti-tanker-blue', altitude=23000, freq=258, tacan='38', variant='Boom'})
             }
         })
