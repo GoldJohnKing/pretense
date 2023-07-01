@@ -1,3 +1,5 @@
+-- VIP welcome messages
+
 local vip_list = {
     -- 老金
     ["197bd981b5ebe0f48479499ab7606856"] = {
@@ -82,6 +84,9 @@ local function vip_reset(_player_id)
     end
 end
 
+
+-- Slot block check
+
 local function slot_block_check(_slot_id)
     local _group_name = DCS.getUnitProperty(_slot_id, DCS.UNIT_GROUPNAME)
     local _status, _error = net.dostring_in('server', "return trigger.misc.getUserFlag(\"" .. _group_name .. "\")")
@@ -97,6 +102,62 @@ local function kick_user_to_spectator(_player_id, _resaon)
 
     return false
 end
+
+
+-- Mission restart check
+
+local mission_restart_flag = "FLAG_MISSION_RESTART"
+
+local mission_list = {
+    ["Pretense_攻占高加索.miz"] = 1,
+}
+
+local function get_random(tb)
+    local keys = {}
+
+    for key, value in pairs(tb) do
+        table.insert(keys, key)
+    end
+
+    return tb[keys[math.random(#keys)]]
+end
+
+local last_time = 0
+
+local function mission_restart_check()
+    -- Check mission restart flag every 15 seconds
+    local current_time = DCS.getModelTime()
+    if current_time < last_time + 15 then
+        return
+    end
+
+    last_time = current_time
+
+    -- Check mission restart flag
+    local status, error = net.dostring_in("server", "return trigger.misc.getUserFlag(\"" .. mission_restart_flag .. "\")")
+    if status and tonumber(status) == 0 then
+        return
+    end
+
+    -- Get a random mission
+    local current_mission = DCS.getMissionFilename()
+    local active_mission_list = {}
+    for key, value in pairs(mission_list) do
+        -- if key ~= current_mission then
+            for i = 1, value do
+                table.insert(active_mission_list, key)
+            end
+        -- end
+    end
+
+    local selected_mission = get_random(active_mission_list)
+
+    -- Restart mission
+    net.load_mission(lfs.writedir() .. "Missions/" .. selected_mission)
+end
+
+
+-- Set user callbacks
 
 local user_callbacks = {}
 
@@ -114,8 +175,14 @@ function user_callbacks.onPlayerChangeSlot(_player_id)
     vip_welcome(_player_id)
 end
 
+-- This will trigger once player connect to server
 function user_callbacks.onPlayerConnect(_player_id)
     vip_reset(_player_id)
+end
+
+-- This will trigger on every frame
+function user_callbacks.onSimulationFrame()
+    mission_restart_check()
 end
 
 DCS.setUserCallbacks(user_callbacks)

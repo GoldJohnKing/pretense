@@ -7,6 +7,7 @@ local script_list =
     "pretense_compiled.lua",
     "init.lua",
     "unlock_slots_in_zones.lua",
+    "restart_timer.lua",
 }
 
 local function load_scripts(path, list)
