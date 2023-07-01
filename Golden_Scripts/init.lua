@@ -4602,10 +4602,10 @@ timer.scheduleFunction(function(param, time)
 		end
 		
 		if gr and Utils.allGroupIsLanded(gr) and Utils.someOfGroupInZone(gr, data.zone.name) then 
-			data.zone:addResource(25000) -- Edited, increase offmap resource delivery per time, default = 15000
+			data.zone:addResource(15000)
 			gr:destroy()
 			offmapSupplyRegistry[groupname] = nil
-			env.info(groupname..' landed at '..data.zone.name..' and delivered 25000 resources') -- Edited, increase offmap resource delivery per time, default = 15000
+			env.info(groupname..' landed at '..data.zone.name..' and delivered 15000 resources')
 		end
 	end
 
