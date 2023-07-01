@@ -4,6 +4,7 @@ local script_list =
 {
     -- Load order must be correct
     "mist_4_5_107_custom.lua",
+    "config_override.lua",
     "pretense_compiled.lua",
     "init.lua",
     "unlock_slots_in_zones.lua",
