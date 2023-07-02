@@ -2526,7 +2526,7 @@ do
 					return
 				end
 
-				if Utils.getAGL(un) > 50 then
+				if Utils.getAGL(un) > 70 then
 					trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot. Altitude too high', 10)
 					return
 				end
@@ -2537,7 +2537,7 @@ do
 				end
 
 				local data = self.csarTracker:getClosestPilot(un:getPoint())
-				if data and data.dist < 50 then
+				if data and data.dist < 100 then
 					if not self.carriedPilots[gr:getID()] then self.carriedPilots[gr:getID()] = {} end
 					
 					table.insert(self.carriedPilots[gr:getID()], data.name)
@@ -3300,6 +3300,20 @@ do
 		end
 		
 		return nil
+	end
+
+	function ZoneCommand.getClosestZoneToPoint(point)
+		local minDist = 9999999
+		local closest = nil
+		for i,v in pairs(ZoneCommand.allZones) do
+			local d = mist.utils.get2DDist(v.zone.point, point)
+			if d < minDist then
+				minDist = d
+				closest = v
+			end
+		end
+		
+		return closest, minDist
 	end
 	
 	function ZoneCommand.getZoneOfPoint(point)
@@ -7243,7 +7257,7 @@ do
 						missionCommands.removeItemForCoalition(dr.side, dr.jtacMenu)
 						dr.jtacMenu = nil
 					end
-				end, drone, i)
+				end, self, i)
 			end
 
             local dial = missionCommands.addSubMenuForCoalition(self.side, 'Set Laser Code', self.jtacMenu)
@@ -7267,7 +7281,7 @@ do
 					missionCommands.removeItemForCoalition(dr.side, dr.jtacMenu)
 					dr.jtacMenu = nil
 				end
-			end, drone)
+			end, self)
 		end
 	end
 	
@@ -10383,8 +10397,19 @@ do
             })
             
             table.insert(self.objectives, escort)
-            description = description..'   Escort convoy on route to their destination'
-            description = description..'\n   Target will be assigned after accepting mission'
+
+            local nearzone = ""
+            local gr = Group.getByName(convoy.name)
+            if gr and gr:getSize()>0 then
+                local un = gr:getUnit(1)
+                local closest = ZoneCommand.getClosestZoneToPoint(un:getPoint())
+                if closest then
+                    nearzone = ' near '..closest.name..''
+                end
+            end
+
+            description = description..'   Escort convoy'..nearzone..' on route to their destination'
+            --description = description..'\n   Target will be assigned after accepting mission'
 
         end
 
@@ -10756,7 +10781,18 @@ do
             })
 
             table.insert(self.objectives, kill)
-            description = description..'   Destroy '..tgt.product.display..' before it reaches its destination.'
+
+            local nearzone = ""
+            local gr = Group.getByName(tgt.name)
+            if gr and gr:getSize()>0 then
+                local un = gr:getUnit(1)
+                local closest = ZoneCommand.getClosestZoneToPoint(un:getPoint())
+                if closest then
+                    nearzone = ' near '..closest.name..''
+                end
+            end
+
+            description = description..'   Destroy '..tgt.product.display..nearzone..' before it reaches its destination.'
             
             MissionTargetRegistry.removeBaiTarget(tgt)
         end
@@ -10866,11 +10902,16 @@ do
             })
             table.insert(self.objectives, unload)
 
-            description = description..'   Rescue '..tgt.name..' and deliver them to a friendly zone'
+            local nearzone = ''
+            local closest = ZoneCommand.getClosestZoneToPoint(tgt.pilot:getUnit(1):getPoint())
+            if closest then
+                nearzone = ' near '..closest.name..''
+            end
 
-            local mgrs = coord.LLtoMGRS(coord.LOtoLL(tgt.pilot:getUnit(1):getPoint()))
-            local grid = mist.tostringMGRS(mgrs, 2):gsub(' ','')
-            description = description..' ['..grid..']'
+            description = description..'   Rescue '..tgt.name..nearzone..' and deliver them to a friendly zone'
+            --local mgrs = coord.LLtoMGRS(coord.LOtoLL(tgt.pilot:getUnit(1):getPoint()))
+            --local grid = mist.tostringMGRS(mgrs, 2):gsub(' ','')
+            --description = description..' ['..grid..']'
         end
         self.description = self.description..description
     end
@@ -10922,15 +10963,21 @@ do
 
                 local infName = PlayerLogistics.getInfantryName(tgt.data.type)
 
-                description = description..'   Extract '..infName..' to a friendly zone'
                 
+                local nearzone = ''
                 local gr = Group.getByName(tgt.name)
                 if gr and gr:isExist() and gr:getSize()>0 then
                     local un = gr:getUnit(1)
-                    local mgrs = coord.LLtoMGRS(coord.LOtoLL(un:getPoint()))
-                    local grid = mist.tostringMGRS(mgrs, 2):gsub(' ','')
-                    description = description..' ['..grid..']'
+                    local closest = ZoneCommand.getClosestZoneToPoint(un:getPoint())
+                    if closest then
+                        nearzone = ' near '..closest.name..''
+                    end
+                    --local mgrs = coord.LLtoMGRS(coord.LOtoLL(un:getPoint()))
+                    --local grid = mist.tostringMGRS(mgrs, 2):gsub(' ','')
+                    --description = description..' ['..grid..']'
                 end
+
+                description = description..'   Extract '..infName..nearzone..' to a friendly zone'
             end
         end
         self.description = self.description..description
@@ -12188,11 +12235,13 @@ do
                                     x = event.initiator:getPoint().x,
                                     y = event.initiator:getPoint().z
                                 }
-                                
-                                local srfType = land.getSurfaceType(pos)
-                                if srfType ~= land.SurfaceType.WATER and srfType ~= land.SurfaceType.SHALLOW_WATER then
-                                    local gr = Spawner.createPilot(name, pos)
-                                    self.context:addPilot(name, gr)
+
+                                if pos.x ~= 0 and pos.y ~= 0 then
+                                    local srfType = land.getSurfaceType(pos)
+                                    if srfType ~= land.SurfaceType.WATER and srfType ~= land.SurfaceType.SHALLOW_WATER then
+                                        local gr = Spawner.createPilot(name, pos)
+                                        self.context:addPilot(name, gr)
+                                    end
                                 end
                             end
                         end
@@ -12250,16 +12299,16 @@ do
         MissionTargetRegistry.addPilot(self.activePilots[name])
     end
 
-    function CSARTracker:restorePilot(save)                     
+    function CSARTracker:restorePilot(save)         
         local gr = Spawner.createPilot(save.name, save.pos)
-
+        
         self.activePilots[save.name] = {
             pilot = gr, 
             name = save.name, 
             remainingTime = save.remainingTime
         }
-
-        MissionTargetRegistry.addPilot(self.activePilots[save.name])
+        
+        MissionTargetRegistry.addPilot(self.activePilots[save.name])       
     end
 
     function CSARTracker:getClosestPilot(toPosition)
