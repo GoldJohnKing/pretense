@@ -2522,35 +2522,44 @@ do
 					return
 				end
 
-				if not self:isCargoDoorOpen(un) then
-					trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot while cargo door closed', 10)
-					return
-				end
+				timer.scheduleFunction(function(param,time) 
+					local self = param.context
+					local un = param.unit
 
-				if Utils.getAGL(un) > 70 then
-					trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot. Altitude too high', 10)
-					return
-				end
+					local data = self.csarTracker:getClosestPilot(un:getPoint())
 
-				if mist.vec.mag(un:getVelocity())>5 then
-					trigger.action.outTextForUnit(un:getID(), "Can not extract pilot. Moving too fast", 15)
-					return
-				end
+					if not data or data.dist > 500 then
+						trigger.action.outTextForUnit(un:getID(), 'There is no pilot nearby that needs extraction', 10)
+						return
+					else
+						if not self:isCargoDoorOpen(un) then
+							trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot while cargo door closed', 5)
+						elseif Utils.getAGL(un) > 70 then
+							trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot. Altitude too high (< 70 m). Current: '..Utils.getAGL(un)..' m', 5)
+						elseif mist.vec.mag(un:getVelocity())>5 then
+							trigger.action.outTextForUnit(un:getID(), "Can not extract pilot. Moving too fast (< 5 m/s). Current: "..mist.vec.mag(un:getVelocity())..' m/s', 5)
+						else
+							if data.dist > 100 then
+								trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot. Too far (< 100m)', 5)
+							else
+								if not self.carriedPilots[gr:getID()] then self.carriedPilots[gr:getID()] = {} end
+								table.insert(self.carriedPilots[gr:getID()], data.name)
+								local player = un:getPlayerName()
+								self.missionTracker:tallyLoadPilot(player, data)
+								self.csarTracker:removePilot(data.name)
+								local count = #(self.carriedPilots[gr:getID()])
+								trigger.action.setUnitInternalCargo(un:getName(), 100*count)
+								trigger.action.outTextForUnit(un:getID(), data.name..' onboard. ('..100*count..' kg)', 10)
+								return
+							end
+						end
+					end
 
-				local data = self.csarTracker:getClosestPilot(un:getPoint())
-				if data and data.dist < 100 then
-					if not self.carriedPilots[gr:getID()] then self.carriedPilots[gr:getID()] = {} end
-					
-					table.insert(self.carriedPilots[gr:getID()], data.name)
-					local player = un:getPlayerName()
-					self.missionTracker:tallyLoadPilot(player, data)
-					self.csarTracker:removePilot(data.name)
-					local count = #(self.carriedPilots[gr:getID()])
-					trigger.action.setUnitInternalCargo(un:getName(), 100*count)
-					trigger.action.outTextForUnit(un:getID(), data.name..' onboard. ('..100*count..' kg)', 10)
-				else
-					trigger.action.outTextForUnit(un:getID(), 'There is no pilot nearby that needs extraction', 10)
-				end
+					param.trys = param.trys - 1
+					if param.trys > 0 then
+						return time+1
+					end
+				end, {context = self, unit = un, trys = 30}, timer.getTime()+1)
 			end
 		end
 	end
@@ -5854,7 +5863,7 @@ do
                 end
 
                 trigger.action.outTextForUnit(unit:getID(), msg, 5)
-                env.info("PlayerTracker.addRankRewards - Awarded "..p.." a CMD token with chance "..cmdChance.." die roll "..die)
+                env.info("PlayerTracker.addRankRewards - Awarded "..player.." a CMD token with chance "..cmdChance.." die roll "..die)
             end
         end
     end
