@@ -5850,9 +5850,9 @@ do
             local die = math.random()
             if die <= cmdChance then
                 if isTemp then
-                    self:addStat(player, 1, PlayerTracker.statTypes.cmd)
-                else
                     self:addTempStat(player, 1, PlayerTracker.statTypes.cmd)
+                else
+                    self:addStat(player, 1, PlayerTracker.statTypes.cmd)
                 end
 
                 local msg = ""
@@ -7782,6 +7782,7 @@ ObjDestroyGroup = Objective:new(Objective.types.destroy_group)
 do
     ObjDestroyGroup.requiredParams = {
         ['target'] = true,
+        ['targetUnitNames'] = true,
         ['lastUpdate'] = true
     }
 
@@ -7789,8 +7790,15 @@ do
         local msg = 'Destroy '..self.param.target.product.display..' before it reaches its destination.\n'
 
         local gr = Group.getByName(self.param.target.name)
-        
         if gr and gr:getSize()>0 then
+            local killcount = 0
+            for i,v in pairs(self.param.targetUnitNames) do
+                if v == true then
+                    killcount = killcount + 1
+                end
+            end
+
+            msg = msg..'\n     '..gr:getSize()..' units remaining. (killed '..killcount..')\n'
             for name, unit in pairs(self.mission.players) do
                 if unit and unit:isExist() then
                     local tgtUnit = gr:getUnit(1)
@@ -7836,7 +7844,15 @@ do
                     self.param.lastUpdate = timer.getAbsTime()
                 end
             elseif target.state == 'enroute' then
-                self.isComplete = true
+                for i,v in pairs(self.param.targetUnitNames) do
+                    if v == true then
+                        self.isComplete = true
+                        return true
+                    end
+                end
+
+                self.isFailed = true
+                self.mission.failureReason = 'Convoy was killed by someone else.'
                 return true
             else
                 self.isFailed = true
@@ -9240,12 +9256,11 @@ do
                         obj.param.killed = true
                     end
                 elseif obj.type == ObjDestroyGroup:getType() then
-                    -- does not work, killed unit no longer belongs to group :(
-                    --if kill.getGroup and obj.param.target.name == kill:getGroup():getName() then
-                        --obj.param.killed = true
-                    --end
-
-                    --if not kill.getGroup then env.info("Mission - tallyKill, kill has no getGroup function") end
+                    if kill.getName then
+                        if obj.param.targetUnitNames[kill:getName()] ~= nil then
+                            obj.param.targetUnitNames[kill:getName()] = true
+                        end
+                    end
                 elseif obj.type == ObjAirKillBonus:getType() then
                     for _,a in ipairs(obj.param.attr) do
                         if kill:hasAttribute(a) then
@@ -10703,26 +10718,32 @@ do
         
         if tgt then
 
-            local kill = ObjDestroyGroup:new() 
-            kill:initialize(self, {
-                target = tgt,
-                lastUpdate = timer.getAbsTime()
-            })
-
-            table.insert(self.objectives, kill)
-
-            local nearzone = ""
             local gr = Group.getByName(tgt.name)
             if gr and gr:getSize()>0 then
+                local units = {}
+                for i,v in ipairs(gr:getUnits()) do
+                    units[v:getName()] = false
+                end
+
+                local kill = ObjDestroyGroup:new() 
+                kill:initialize(self, {
+                    target = tgt,
+                    targetUnitNames = units,
+                    lastUpdate = timer.getAbsTime()
+                })
+
+                table.insert(self.objectives, kill)
+
+                local nearzone = ""
                 local un = gr:getUnit(1)
                 local closest = ZoneCommand.getClosestZoneToPoint(un:getPoint())
                 if closest then
                     nearzone = ' near '..closest.name..''
                 end
+
+                description = description..'   Destroy '..tgt.product.display..nearzone..' before it reaches its destination.'
             end
 
-            description = description..'   Destroy '..tgt.product.display..nearzone..' before it reaches its destination.'
-            
             MissionTargetRegistry.removeBaiTarget(tgt)
         end
         self.description = self.description..description
