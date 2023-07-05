@@ -109,7 +109,9 @@ end
 local mission_restart_flag = "FLAG_MISSION_RESTART"
 
 local mission_list = {
-    ["Pretense_攻占高加索.miz"] = 1,
+    ["Pretense_攻占高加索_冬季_下雪_强风_0900"] = 1,
+    ["Pretense_攻占高加索_秋季_下雨_微风_0600"] = 1,
+    ["Pretense_攻占高加索_夏季_晴朗_微风_1500"] = 1,
 }
 
 local function get_random(tb)
