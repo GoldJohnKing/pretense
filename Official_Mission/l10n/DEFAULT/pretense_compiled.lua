@@ -2525,6 +2525,7 @@ do
 				timer.scheduleFunction(function(param,time) 
 					local self = param.context
 					local un = param.unit
+					if not un then return end
 
 					local data = self.csarTracker:getClosestPilot(un:getPoint())
 
@@ -2533,14 +2534,14 @@ do
 						return
 					else
 						if not self:isCargoDoorOpen(un) then
-							trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot while cargo door closed', 5)
+							trigger.action.outTextForUnit(un:getID(), 'Cargo door closed', 1)
 						elseif Utils.getAGL(un) > 70 then
-							trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot. Altitude too high (< 70 m). Current: '..Utils.getAGL(un)..' m', 5)
+							trigger.action.outTextForUnit(un:getID(), 'Altitude too high (< 70 m). Current: '..string.format('%.2f',Utils.getAGL(un))..' m', 1)
 						elseif mist.vec.mag(un:getVelocity())>5 then
-							trigger.action.outTextForUnit(un:getID(), "Can not extract pilot. Moving too fast (< 5 m/s). Current: "..mist.vec.mag(un:getVelocity())..' m/s', 5)
+							trigger.action.outTextForUnit(un:getID(), 'Moving too fast (< 5 m/s). Current: '..string.format('%.2f',mist.vec.mag(un:getVelocity()))..' m/s', 1)
 						else
 							if data.dist > 100 then
-								trigger.action.outTextForUnit(un:getID(), 'Can not extract pilot. Too far (< 100m)', 5)
+								trigger.action.outTextForUnit(un:getID(), 'Too far (< 100m). Current: '..string.format('%.2f',data.dist)..' m', 1)
 							else
 								if not self.carriedPilots[gr:getID()] then self.carriedPilots[gr:getID()] = {} end
 								table.insert(self.carriedPilots[gr:getID()], data.name)
@@ -2559,7 +2560,7 @@ do
 					if param.trys > 0 then
 						return time+1
 					end
-				end, {context = self, unit = un, trys = 30}, timer.getTime()+1)
+				end, {context = self, unit = un, trys = 60}, timer.getTime()+0.1)
 			end
 		end
 	end
@@ -3167,6 +3168,8 @@ do
 		obj.boostScale = 1.0
 		obj.extraBuildResources = 0
 		obj.reservedMissions = {}
+		obj.isHeloSpawn = false
+		obj.isPlaneSpawn = false
 
 		obj.connectionManager = nil
 		
@@ -3429,7 +3432,6 @@ do
 			--else
 			--	trigger.action.setMarkupText(1000+self.index, self.name)
 			--end
-			
 			trigger.action.setMarkupText(2000+self.index, self.name..label)
 		elseif self.side == 0 then
 			--trigger.action.setMarkupText(1000+self.index, ' '..self.name..' ')
@@ -3454,6 +3456,12 @@ do
 		
 		trigger.action.setMarkupColorFill(self.index, color)
 		trigger.action.setMarkupColor(self.index, color)
+		trigger.action.setMarkupTypeLine(self.index, 1)
+
+		if self.side == 2 and (self.isHeloSpawn or self.isPlaneSpawn) then
+			trigger.action.setMarkupTypeLine(self.index, 2)
+			trigger.action.setMarkupColor(self.index, {0,1,0,1})
+		end
 
 		self:refreshText()
 	end
@@ -6046,7 +6054,7 @@ do
                             local count = 0
                             for i,v in pairs(ZoneCommand.getAllZones()) do
                                 if v.side == 1 then
-                                    if math.random()<0.9 then
+                                    if math.random()<0.5 then
                                         v:reveal()
                                         count = count + 1
                                     end
@@ -6171,20 +6179,20 @@ do
     PlayerTracker.ranks[3] =  { rank=3,  name='E-3 Airman first class',     requiredXP = 4500,     cmdChance = 0}
     PlayerTracker.ranks[4] =  { rank=4,  name='E-4 Senior airman',          requiredXP = 7700,     cmdChance = 0}
     PlayerTracker.ranks[5] =  { rank=5,  name='E-5 Staff sergeant',         requiredXP = 11800,    cmdChance = 0}
-    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.03}
-    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.04}
-    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.05}
-    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.07}
-    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.10}
-    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.15}
-    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.21}
-    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.30}
-    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.40}
-    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.50}
-    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.60}
-    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.70}
-    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.80}
-    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 0.90}
+    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01}
+    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.02}
+    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.03}
+    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.05}
+    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.08}
+    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.10}
+    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.14}
+    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.17}
+    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.22}
+    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.26}
+    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.32}
+    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.37}
+    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.43}
+    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 0.50}
 
     function PlayerTracker:getPlayerRank(playername)
         if self.stats[playername] then

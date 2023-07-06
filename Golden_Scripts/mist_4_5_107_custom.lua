@@ -755,7 +755,10 @@ do -- the main scope
 				if mist.DBs.aliveUnits and mist.DBs.aliveUnits[val.object.id_] then
 					----dbLog:info('object found in alive_units')
 					val.objectData = mist.utils.deepCopy(mist.DBs.aliveUnits[val.object.id_])
-					local pos = Object.getPosition(val.object)
+					local pos = nil
+					if Object.isExist(val.object) then
+						pos = Object.getPosition(val.object)
+					end
 					if pos then
 						val.objectPos = pos.p
 					end
@@ -764,7 +767,10 @@ do -- the main scope
 				elseif mist.DBs.removedAliveUnits and mist.DBs.removedAliveUnits[val.object.id_] then	-- it didn't exist in alive_units, check old_alive_units
 					----dbLog:info('object found in old_alive_units')
 					val.objectData = mist.utils.deepCopy(mist.DBs.removedAliveUnits[val.object.id_])
-					local pos = Object.getPosition(val.object)
+					local pos = nil
+					if Object.isExist(val.object) then
+						pos = Object.getPosition(val.object)
+					end
 					if pos then
 						val.objectPos = pos.p
 					end
@@ -772,7 +778,11 @@ do -- the main scope
 
 				else	--attempt to determine if static object...
 					----dbLog:info('object not found in alive units or old alive units')
-					local pos = Object.getPosition(val.object)
+					local pos = nil
+					if Object.isExist(val.object) then
+						pos = Object.getPosition(val.object)
+					end
+
 					if pos then
 						local static_found = false
 						for ind, static in pairs(mist.DBs.unitsByCat.static) do
@@ -1328,7 +1338,10 @@ do -- the main scope
 				if mist.DBs.aliveUnits and mist.DBs.aliveUnits[val.object.id_] then
 					--log:info('object found in alive_units')
 					val.objectData = mist.utils.deepCopy(mist.DBs.aliveUnits[val.object.id_])
-					local pos = Object.getPosition(val.object)
+					local pos = nil
+					if Object.isExist(val.object) then
+						pos = Object.getPosition(val.object)
+					end
 					if pos then
 						val.objectPos = pos.p
 					end
@@ -1340,7 +1353,10 @@ do -- the main scope
 				elseif mist.DBs.removedAliveUnits and mist.DBs.removedAliveUnits[val.object.id_] then	-- it didn't exist in alive_units, check old_alive_units
 					--log:info('object found in old_alive_units')
 					val.objectData = mist.utils.deepCopy(mist.DBs.removedAliveUnits[val.object.id_])
-					local pos = Object.getPosition(val.object)
+					local pos = nil
+					if Object.isExist(val.object) then
+						pos = Object.getPosition(val.object)
+					end
 					if pos then
 						val.objectPos = pos.p
 					end

@@ -48,7 +48,7 @@ options =
         ["easyCommunication"] = false,
         ["reports"] = true,
         ["heading_units"] = 1,
-        ["units"] = "imperial",
+        ["units"] = "metric",
         ["externalViews"] = true,
         ["autoTrimmer"] = false,
         ["controlsIndicator"] = false,
@@ -355,6 +355,12 @@ options =
             ["USE_REAL_TDC"] = false,
             ["MPCD_EXPORT"] = false,
         }, -- end of ["AV8BNA"]
+        ["MiG-29"] = 
+        {
+            ["CPLocalList_MiG-29S"] = "default",
+            ["CPLocalList_MiG-29G"] = "default",
+            ["CPLocalList_MiG-29A"] = "default",
+        }, -- end of ["MiG-29"]
         ["UH-60L"] = 
         {
             ["aimingMarkRemove"] = false,
@@ -457,6 +463,11 @@ options =
             ["trimSpeedRoll"] = 100,
             ["customRollPressure"] = 50,
         }, -- end of ["A-4E-C"]
+        ["Supercarrier"] = 
+        {
+            ["enable_FLOLS_overlay"] = true,
+            ["Use_native_ATC_text"] = false,
+        }, -- end of ["Supercarrier"]
         ["CA"] = 
         {
             ["kompass_options"] = 2,
@@ -468,11 +479,6 @@ options =
             ["ground_automatic"] = true,
             ["automatic_clutch"] = true,
         }, -- end of ["CA"]
-        ["Supercarrier"] = 
-        {
-            ["enable_FLOLS_overlay"] = true,
-            ["Use_native_ATC_text"] = false,
-        }, -- end of ["Supercarrier"]
         ["Ka-50_3"] = 
         {
             ["Ka50TrimmingMethod"] = 0,

@@ -742,6 +742,7 @@ zones.mozdok:defineUpgrades({
 
 zones.sierra = ZoneCommand:new("Sierra")
 zones.sierra.initialState = { side=1 }
+zones.sierra.isHeloSpawn = true
 zones.sierra:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
@@ -856,6 +857,7 @@ zones.kilo:defineUpgrades({
 
 zones.tyrnyauz = ZoneCommand:new("Tyrnyauz")
 zones.tyrnyauz.initialState = { side=1 }
+zones.tyrnyauz.isHeloSpawn = true
 zones.tyrnyauz:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
@@ -970,6 +972,7 @@ zones.alpha:defineUpgrades({
 
 zones.unal = ZoneCommand:new("Unal")
 zones.unal.initialState = { side=1 }
+zones.unal.isHeloSpawn = true
 zones.unal:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
@@ -1174,6 +1177,8 @@ zones.distillery:defineUpgrades({
 zones.kobuleti = ZoneCommand:new("Kobuleti")
 zones.kobuleti.initialState = { side=2 }
 zones.kobuleti.keepActive = true
+zones.kobuleti.isHeloSpawn = true
+zones.kobuleti.isPlaneSpawn = true
 zones.kobuleti.maxResource = 50000
 zones.kobuleti:defineUpgrades({
     [1] = 
@@ -1249,6 +1254,8 @@ zones.kobuleti:defineUpgrades({
 zones.senaki = ZoneCommand:new("Senaki")
 zones.senaki.initialState = { side=1 }
 zones.senaki.keepActive = true
+zones.senaki.isHeloSpawn = true
+zones.senaki.isPlaneSpawn = true
 zones.senaki.maxResource = 50000
 zones.senaki:defineUpgrades({
     [1] = 
@@ -1532,6 +1539,8 @@ zones.mike:defineUpgrades({
 zones.batumi = ZoneCommand:new('Batumi')
 zones.batumi.initialState = { side=2 }
 zones.batumi.keepActive = true
+zones.batumi.isHeloSpawn = true
+zones.batumi.isPlaneSpawn = true
 zones.batumi.maxResource = 50000
 zones.batumi:defineUpgrades({
     [1] = { --red side
@@ -1898,6 +1907,7 @@ zones.mine:defineUpgrades({
 
 zones.cherkessk = ZoneCommand:new("Cherkessk")
 zones.cherkessk.initialState = { side=1 }
+zones.cherkessk.isHeloSpawn = true
 zones.cherkessk:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
@@ -3293,6 +3303,7 @@ zones.papa:defineUpgrades({
 
 zones.golf = ZoneCommand:new("Golf")
 zones.golf.initialState = nil
+zones.golf.isHeloSpawn = true
 zones.golf:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
@@ -3353,6 +3364,8 @@ zones.golf:defineUpgrades({
 zones.mineralnye = ZoneCommand:new("Mineralnye")
 zones.mineralnye.initialState = { side=1 }
 zones.mineralnye.keepActive = true
+zones.mineralnye.isHeloSpawn = true
+zones.mineralnye.isPlaneSpawn = true
 zones.mineralnye:defineUpgrades({
     [1] = 
     {
@@ -3423,6 +3436,8 @@ zones.mineralnye:defineUpgrades({
 zones.nalchik = ZoneCommand:new("Nalchik")
 zones.nalchik.initialState = { side=1 }
 zones.nalchik.keepActive = true
+zones.nalchik.isHeloSpawn = true
+zones.nalchik.isPlaneSpawn = true
 zones.nalchik:defineUpgrades({
     [1] = 
     {
@@ -3491,6 +3506,7 @@ zones.nalchik:defineUpgrades({
 
 zones.november = ZoneCommand:new("November")
 zones.november.initialState = { side=1 }
+zones.november.isHeloSpawn = true
 zones.november:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
@@ -3794,6 +3810,7 @@ zones.charlie:defineUpgrades({
 
 zones.tango = ZoneCommand:new("Tango")
 zones.tango.initialState = { side=1 }
+zones.tango.isHeloSpawn = true
 zones.tango:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
