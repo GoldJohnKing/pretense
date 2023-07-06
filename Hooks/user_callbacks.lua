@@ -155,7 +155,7 @@ local function mission_restart_check()
     local selected_mission = get_random(active_mission_list)
 
     -- Restart mission
-    net.load_mission(lfs.writedir() .. "Missions/" .. selected_mission)
+    net.load_mission(lfs.writedir() .. "Missions/" .. selected_mission .. ".miz")
 end
 
 
