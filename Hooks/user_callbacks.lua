@@ -109,9 +109,14 @@ end
 local mission_restart_flag = "FLAG_MISSION_RESTART"
 
 local mission_list = {
-    ["Pretense_攻占高加索_冬季_下雪_强风_0900"] = 1,
-    ["Pretense_攻占高加索_秋季_下雨_微风_0600"] = 1,
-    ["Pretense_攻占高加索_夏季_晴朗_微风_1500"] = 1,
+    ["Pretense_攻占高加索_春季_晴朗_1500"] = 3,
+    ["Pretense_攻占高加索_夏季_无风_1500"] = 3,
+    ["Pretense_攻占高加索_夏季_酷热_0600"] = 2,
+    ["Pretense_攻占高加索_秋季_晴朗_1200"] = 3,
+    ["Pretense_攻占高加索_秋季_下雨_0900"] = 3,
+    ["Pretense_攻占高加索_冬季_强风_1200"] = 2,
+    ["Pretense_攻占高加索_冬季_下雪_0900"] = 3,
+    ["Pretense_攻占高加索_夜间_无风_0000"] = 1,
 }
 
 local function get_random(tb)
@@ -145,11 +150,11 @@ local function mission_restart_check()
     local current_mission = DCS.getMissionFilename()
     local active_mission_list = {}
     for key, value in pairs(mission_list) do
-        -- if key ~= current_mission then
+        if key ~= current_mission then
             for i = 1, value do
                 table.insert(active_mission_list, key)
             end
-        -- end
+        end
     end
 
     local selected_mission = get_random(active_mission_list)
