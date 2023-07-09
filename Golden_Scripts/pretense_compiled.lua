@@ -6048,11 +6048,11 @@ do
                                 end
                             end
                             if count > 0 then
-                                trigger.action.outTextForGroup(gr:getID(), "Intercepted enemy communications have revealed information on "..count.." enemy zones",20)
+                                trigger.action.outTextForGroup(params.groupid, "Intercepted enemy communications have revealed information on "..count.." enemy zones",20)
                             else
-                                trigger.action.outTextForGroup(gr:getID(), "No useful information has been intercepted",20)
+                                trigger.action.outTextForGroup(params.groupid, "No useful information has been intercepted",20)
                             end
-                        end, {}, timer.getTime()+60)
+                        end, {groupid=gr:getID()}, timer.getTime()+60)
 
                         trigger.action.outTextForGroup(gr:getID(), "Attempting to intercept enemy comms...",60)
 
@@ -6069,11 +6069,11 @@ do
                             end
 
                             if count > 0 then
-                                trigger.action.outTextForGroup(gr:getID(), "Bribed officer has shared intel on "..count.." enemy zones",20)
+                                trigger.action.outTextForGroup(params.groupid, "Bribed officer has shared intel on "..count.." enemy zones",20)
                             else
-                                trigger.action.outTextForGroup(gr:getID(), "Bribed officer has stopped responding to attempted communications.",20)
+                                trigger.action.outTextForGroup(params.groupid, "Bribed officer has stopped responding to attempted communications.",20)
                             end
-                        end, {}, timer.getTime()+(60*5))
+                        end, {groupid=gr:getID()}, timer.getTime()+(60*5))
                         
                         trigger.action.outTextForGroup(gr:getID(), "Bribe has been transfered to enemy officer. Waiting for contact...",20)
                     end

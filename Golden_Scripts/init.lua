@@ -4611,14 +4611,14 @@ timer.scheduleFunction(function(param, time)
 		local blue = nil
 		local minD = 999999999
 		for i,v in ipairs(availableBlue) do
-			local d = mist.utils.get2DDist(zn.zone.point, supplyPointRegistry.red[v])
+			local d = mist.utils.get2DDist(zn.zone.point, supplyPointRegistry.blue[v])
 			if d < minD then
 				blue = v
 				minD = d
 			end
 		end
 
-		if not red then red = availableBlue[math.random(1,#availableBlue)] end
+		if not blue then blue = availableBlue[math.random(1,#availableBlue)] end
 
 		local gr = blue
 		blue = nil
