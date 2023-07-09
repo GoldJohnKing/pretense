@@ -441,15 +441,15 @@ do
 		end
 		
 		local pnt = mist.getRandomPointInZone(spname)
-		for i=1,100,1 do
+		for i=1,500,1 do
 			if land.getSurfaceType(pnt) == land.SurfaceType.LAND then
 				break
 			end
 
 			pnt = mist.getRandomPointInZone(spname)
 		end
-		
-		local newgr = Spawner.createObject(product.name, product.template, pnt, product.side)
+
+		local newgr = Spawner.createObject(product.name, product.template, pnt, product.side, nil, nil, nil, spname)
 
 		return newgr
 	end
@@ -542,8 +542,14 @@ do
 		end
 	end
 	
-	function GroupMonitor:registerGroup(product, target, home)
+	function GroupMonitor:registerGroup(product, target, home, savedData)
 		self.groups[product.name] = {name = product.name, lastStateTime = timer.getAbsTime(), product = product, target = target, home = home}
+
+		if savedData and savedData.state ~= 'uninitialized' then
+			env.info('GroupMonitor - registerGroup ['..product.name..'] restored state '..savedData.state..' dur:'..savedData.lastStateDuration)
+			self.groups[product.name].state = savedData.state
+			self.groups[product.name].lastStateTime = timer.getAbsTime() - savedData.lastStateDuration
+		end
 	end
 	
 	function GroupMonitor:start()
@@ -1881,6 +1887,7 @@ do
 		group:getController():setOption(AI.Option.Air.id.JETT_TANKS_IF_EMPTY, true)
 		group:getController():setOption(AI.Option.Air.id.PROHIBIT_JETT, true)
 		group:getController():setOption(AI.Option.Air.id.REACTION_ON_THREAT, AI.Option.Air.val.REACTION_ON_THREAT.EVADE_FIRE)
+		group:getController():setOption(AI.Option.Air.id.MISSILE_ATTACK, AI.Option.Air.val.MISSILE_ATTACK.MAX_RANGE)
 
 		local weapons = 268402688  -- AnyMissile
 		group:getController():setOption(AI.Option.Air.id.RTB_ON_OUT_OF_AMMO, weapons)
@@ -4200,7 +4207,7 @@ do
 		if supplyPoint then 
 			mist.teleportToPoint(getDefaultPos(savedData, false))
 			if ZoneCommand.groupMonitor then
-				ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+				ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 			end
 
 			product.lastMission = {zoneName = zone.name}
@@ -4221,7 +4228,7 @@ do
 		if supplyPoint then 
 			mist.teleportToPoint(getDefaultPos(savedData, false))
 			if ZoneCommand.groupMonitor then
-				ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+				ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 			end
 
 			local tgtPoint = trigger.misc.getZone(zone.name)
@@ -4241,7 +4248,7 @@ do
 
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+			ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 		end
 
 		local supplyPoint = trigger.misc.getZone(zone.name..'-hsp')
@@ -4268,7 +4275,7 @@ do
 
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+			ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 		end
 
 		local homePos = trigger.misc.getZone(savedData.homeName).point
@@ -4292,7 +4299,7 @@ do
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+			ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 		end
 
 		local homePos = trigger.misc.getZone(savedData.homeName).point
@@ -4311,7 +4318,7 @@ do
 
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+			ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 		end
 
 		local homePos = trigger.misc.getZone(savedData.homeName).point
@@ -4331,7 +4338,7 @@ do
 
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, zn1, self)
+			ZoneCommand.groupMonitor:registerGroup(product, zn1, self, savedData)
 		end
 
 		local homePos = trigger.misc.getZone(savedData.homeName).point
@@ -4363,7 +4370,7 @@ do
 		if hasTarget then 
 			mist.teleportToPoint(getDefaultPos(savedData, true))
 			if ZoneCommand.groupMonitor then
-				ZoneCommand.groupMonitor:registerGroup(product, nil, self)
+				ZoneCommand.groupMonitor:registerGroup(product, nil, self, savedData)
 			end
 
 			product.lastMission = { active = true }
@@ -4381,7 +4388,7 @@ do
 
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, nil, self)
+			ZoneCommand.groupMonitor:registerGroup(product, nil, self, savedData)
 		end
 		timer.scheduleFunction(function(param)
 			local gr = Group.getByName(param.prod.name)
@@ -4406,7 +4413,7 @@ do
 		local homePos = trigger.misc.getZone(savedData.homeName).point
 		mist.teleportToPoint(getDefaultPos(savedData, true))
 		if ZoneCommand.groupMonitor then
-			ZoneCommand.groupMonitor:registerGroup(product, zone, self)
+			ZoneCommand.groupMonitor:registerGroup(product, zone, self, savedData)
 		end
 		
 		timer.scheduleFunction(function(param)
@@ -6563,7 +6570,9 @@ do
     
         local reActivateStates = {
             ['inair'] = true,
-            ['enroute'] = true
+            ['enroute'] = true,
+            ['atdestination'] = true,
+            ['siege'] = true
         }
     
         for i,v in pairs(save.activeGroups) do
@@ -6939,8 +6948,12 @@ do
         return coalition.addGroup(country.id.CJTF_BLUE, Group.Category.GROUND, groupData)
     end
 
-    function Spawner.createObject(name, objType, pos, side, minDist, maxDist, surfaceTypes)
-        local data = Spawner.getData(objType, name, pos, minDist, maxDist, surfaceTypes)
+    function Spawner.createObject(name, objType, pos, side, minDist, maxDist, surfaceTypes, zone)
+        if zone then
+            zone = CustomZone:getByName(zone) -- expand zone name to CustomZone object
+        end
+
+        local data = Spawner.getData(objType, name, pos, minDist, maxDist, surfaceTypes, zone)
 
         if not data then return end
 
@@ -6956,14 +6969,22 @@ do
         end
     end
 
-    function Spawner.getUnit(unitType, name, pos, skill, minDist, maxDist, surfaceTypes)
-        local nudgedPos = mist.getRandPointInCircle(pos, maxDist, minDist)
+    function Spawner.getUnit(unitType, name, pos, skill, minDist, maxDist, surfaceTypes, zone)
+        local nudgedPos = nil
 		for i=1,500,1 do
-			if surfaceTypes[land.getSurfaceType(nudgedPos)] then
-				break
-			end
+            nudgedPos = mist.getRandPointInCircle(pos, maxDist, minDist)
+           
+            if zone then
+                if zone:isInside(nudgedPos) and surfaceTypes[land.getSurfaceType(nudgedPos)] then
+                    break
+                end
+            else
+                if surfaceTypes[land.getSurfaceType(nudgedPos)] then
+                    break
+                end
+            end
 
-			nudgedPos = mist.getRandPointInCircle(pos, maxDist, minDist)
+            if i==500 then env.info('Spawner - ERROR: failed to find good location') end
 		end
 
         return {
@@ -6972,12 +6993,13 @@ do
             ["x"] = nudgedPos.x,
             ["y"] = nudgedPos.y,
             ["name"] = name,
+            ['heading'] = math.random()*math.pi*2,
             ["playerCanDrive"] = false
         }
     end
 
-    function Spawner.getData(objtype, name, pos, minDist, maxDist, surfaceTypes)
-        if not maxDist then maxDist = 100 end
+    function Spawner.getData(objtype, name, pos, minDist, maxDist, surfaceTypes, zone)
+        if not maxDist then maxDist = 150 end
         if not surfaceTypes then surfaceTypes = { [land.SurfaceType.LAND]=true } end
 
         local data = TemplateDB.getData(objtype)
@@ -6993,9 +7015,17 @@ do
                 for i=1,500,1 do
                     pos = mist.getRandPointInCircle(pos, maxDist)
 
-                    if surfaceTypes[land.getSurfaceType(pos)] then
-                        break
+                    if zone then
+                        if zone:isInside(pos) and surfaceTypes[land.getSurfaceType(pos)] then
+                            break
+                        end
+                    else
+                        if surfaceTypes[land.getSurfaceType(pos)] then
+                            break
+                        end
                     end
+                    
+                    if i==500 then env.info('Spawner - ERROR: failed to find good location') end
                 end
             end
 
@@ -7006,6 +7036,7 @@ do
                 ["category"] = data.category,
                 ["x"] = pos.x,
                 ["y"] = pos.y,
+                ['heading'] = math.random()*math.pi*2
             }
         elseif data.dataCategory== TemplateDB.type.group then
             spawnData = {
@@ -7029,7 +7060,7 @@ do
             }
             
             for i,v in ipairs(data.units) do
-                table.insert(spawnData.units, Spawner.getUnit(v, name.."-"..i, pos, data.skill, minDist, maxDist, surfaceTypes))
+                table.insert(spawnData.units, Spawner.getUnit(v, name.."-"..i, pos, data.skill, minDist, maxDist, surfaceTypes, zone))
             end
         end
 
