@@ -3461,6 +3461,7 @@ do
 			color = {0,0,1,0.3}
 		end
 		
+		trigger.action.setMarkupFontSize(self.index, 12) -- Edited, decrease font size
 		trigger.action.setMarkupColorFill(self.index, color)
 		trigger.action.setMarkupColor(self.index, color)
 		trigger.action.setMarkupTypeLine(self.index, 1)
