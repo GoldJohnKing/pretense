@@ -4426,6 +4426,8 @@ ct = CSARTracker:new()
 
 pl = PlayerLogistics:new(mt, pt, st, ct)
 
+gci = GCI:new(2)
+
 gm = GroupMonitor:new(cm)
 ZoneCommand.groupMonitor = gm
 

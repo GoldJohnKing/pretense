@@ -9,6 +9,8 @@ Config.buildSpeed = Config.buildSpeed or 10 -- structure and defense build speed
 Config.supplyBuildSpeed = Config.supplyBuildSpeed or 85 -- supply helicopters and convoys build speed
 Config.missionBuildSpeedReduction = Config.missionBuildSpeedReduction or 0.12 -- reduction of build speed in case of ai missions
 
+Config.missions = Config.missions or {}
+
 -----------------[[ END OF Config.lua ]]-----------------
 
 
@@ -270,6 +272,10 @@ MenuRegistry = {}
 do
     MenuRegistry.menus = {}
     function MenuRegistry:register(order, registerfunction, context)
+        for i=1,order,1 do
+            if not MenuRegistry.menus[i] then MenuRegistry.menus[i] = {func = function() end, context = {}} end
+        end
+
         MenuRegistry.menus[order] = {func = registerfunction, context = context}
     end
 
@@ -471,7 +477,7 @@ do
 	GroupMonitor.blockedDespawnTime = 10*60 --used to despawn aircraft that are stuck taxiing for some reason
 	GroupMonitor.landedDespawnTime = 10
 	GroupMonitor.atDestinationDespawnTime = 2*60
-	GroupMonitor.recoveryReduction = 0.1 -- reduce recovered resource from landed missions by this amount to account for maintenance
+	GroupMonitor.recoveryReduction = 0.8 -- reduce recovered resource from landed missions by this amount to account for maintenance
 
 	GroupMonitor.siegeExplosiveTime = 5*60 -- how long until random upgrade is detonated in zone
 	GroupMonitor.siegeExplosiveStrength = 1000 -- detonation strength
@@ -2533,6 +2539,7 @@ do
 					local self = param.context
 					local un = param.unit
 					if not un then return end
+					if not un:isExist() then return end
 
 					local data = self.csarTracker:getClosestPilot(un:getPoint())
 
@@ -4885,6 +4892,8 @@ do
 		--if target.side ~= product.side then return false end
 		if target.name == self.name then return false end
 		if not target.distToFront or target.distToFront > 1 then return false end
+		local dist = mist.utils.get2DDist(self.zone.point, target.zone.point)
+		if dist > 150000 then return false end
 		
 		return true
 	end
@@ -11129,11 +11138,19 @@ do
         [Mission.types.deep_strike] = 3,
         [Mission.types.scout_helo] = 1,
         [Mission.types.bai] = 1,
-        [Mission.types.anti_runway] =1,
-        [Mission.types.csar] =1,
-        [Mission.types.extraction] =1,
-        [Mission.types.deploy_squad] =1,
+        [Mission.types.anti_runway] = 1,
+        [Mission.types.csar] = 1,
+        [Mission.types.extraction] = 1,
+        [Mission.types.deploy_squad] = 1,
     }
+
+    if Config.missions then
+        for i,v in pairs(Config.missions) do
+            if MissionTracker.maxMissionCount[i] then
+                MissionTracker.maxMissionCount[i] = v
+            end
+        end
+    end
 
     MissionTracker.missionBoardSize = 10
 
@@ -12350,4 +12367,220 @@ do
 end
 
 -----------------[[ END OF CSARTracker.lua ]]-----------------
+
+
+
+-----------------[[ GCI.lua ]]-----------------
+
+GCI = {}
+
+do
+    function GCI:new(side)
+        local o = {}
+        o.side = side
+        o.tgtSide = 0
+        if side == 1 then
+            o.tgtSide = 2
+        elseif side == 2 then
+            o.tgtSide = 1
+        end
+
+        o.radars = {}
+        o.players = {}
+        o.radarTypes = {
+            'SAM SR',
+            'EWR',
+            'AWACS'
+        }
+
+        o.groupMenus = {}
+
+        setmetatable(o, self)
+		self.__index = self
+
+        o:start()
+
+		return o
+    end
+
+    function GCI:registerPlayer(name, unit, warningRadius, metric)
+        if warningRadius > 0 then
+            local msg = "Warning radius set to "..warningRadius
+            if metric then
+                msg=msg.."km" 
+            else
+                msg=msg.."nm"
+            end
+            
+            if metric then
+                warningRadius = warningRadius * 1000
+            else
+                warningRadius = warningRadius * 1852
+            end
+            
+            self.players[name] = {
+                unit = unit, 
+                warningRadius = warningRadius,
+                metric = metric
+            }
+            
+            trigger.action.outTextForUnit(unit:getID(), msg, 10)
+        else
+            self.players[name] = nil
+            trigger.action.outTextForUnit(unit:getID(), "GCI Reports disabled", 10)
+        end
+    end
+
+    function GCI:start()
+        MenuRegistry:register(5, function(event, context)
+			if event.id == world.event.S_EVENT_BIRTH and event.initiator and event.initiator.getPlayerName then
+				local player = event.initiator:getPlayerName()
+				if player then
+					local groupid = event.initiator:getGroup():getID()
+                    local groupname = event.initiator:getGroup():getName()
+                    local unit = event.initiator
+					
+                    if context.groupMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupMenus[groupid])
+                        context.groupMenus[groupid] = nil
+                    end
+
+                    if not context.groupMenus[groupid] then
+                        
+                        local menu = missionCommands.addSubMenuForGroup(groupid, 'GCI')
+                        local setWR = missionCommands.addSubMenuForGroup(groupid, 'Set Warning Radius', menu)
+                        local kmMenu = missionCommands.addSubMenuForGroup(groupid, 'KM', setWR)
+                        local nmMenu = missionCommands.addSubMenuForGroup(groupid, 'NM', setWR)
+
+                        missionCommands.addCommandForGroup(groupid, '10 KM',  kmMenu, Utils.log(context.registerPlayer), context, player, unit, 10, true)
+                        missionCommands.addCommandForGroup(groupid, '25 KM',  kmMenu, Utils.log(context.registerPlayer), context, player, unit, 25, true)
+                        missionCommands.addCommandForGroup(groupid, '50 KM',  kmMenu, Utils.log(context.registerPlayer), context, player, unit, 50, true)
+                        missionCommands.addCommandForGroup(groupid, '100 KM', kmMenu, Utils.log(context.registerPlayer), context, player, unit, 100, true)
+                        missionCommands.addCommandForGroup(groupid, '150 KM', kmMenu, Utils.log(context.registerPlayer), context, player, unit, 150, true)
+
+                        missionCommands.addCommandForGroup(groupid, '5 NM',  nmMenu, Utils.log(context.registerPlayer), context, player, unit, 5, false)
+                        missionCommands.addCommandForGroup(groupid, '10 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 10, false)
+                        missionCommands.addCommandForGroup(groupid, '25 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 25, false)
+                        missionCommands.addCommandForGroup(groupid, '50 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 50, false)
+                        missionCommands.addCommandForGroup(groupid, '80 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 80, false)
+                        missionCommands.addCommandForGroup(groupid, 'Disable', menu, Utils.log(context.registerPlayer), context, player, unit, 0, false)
+
+                        context.groupMenus[groupid] = menu
+                    end
+				end
+			end
+		end, self)
+
+        timer.scheduleFunction(function(param, time)
+            local self = param.context
+            local allunits = coalition.getGroups(self.side)
+  
+            local radars = {}
+            for _,g in ipairs(allunits) do
+                for _,u in ipairs(g:getUnits()) do
+                    for _,a in ipairs(self.radarTypes) do
+                        if u:hasAttribute(a) then
+                            table.insert(radars, u)
+                            break
+                        end
+                    end
+                end
+            end
+
+            self.radars = radars
+            env.info("GCI - tracking "..#radars.." radar enabled units")
+
+            return time+10
+        end, {context = self}, timer.getTime()+1)
+
+        timer.scheduleFunction(function(param, time)
+            local self = param.context
+
+            local plyCount = 0
+            for i,v in pairs(self.players) do
+                if not v.unit or not v.unit:isExist() then
+                    self.players[i] = nil
+                else
+                    plyCount = plyCount + 1
+                end
+            end
+
+            env.info("GCI - reporting to "..plyCount.." players")
+            if plyCount >0 then
+                local dect = {}
+                local dcount = 0
+                for _,u in ipairs(self.radars) do
+                    if u:isExist() then
+                        local detected = u:getController():getDetectedTargets(Controller.Detection.RADAR)
+                        for _,d in ipairs(detected) do
+                            if d.object:isExist() and 
+                                d.object:getCategory() == Object.Category.UNIT and
+                                d.object.getCoalition and
+                                d.object:getCoalition() == self.tgtSide then
+                                    
+                                if not dect[d.object:getName()] then
+                                    dect[d.object:getName()] = d.object
+                                    dcount = dcount + 1
+                                end
+                            end
+                        end
+                    end
+                end
+                
+                env.info("GCI - aware of "..dcount.." enemy units")
+
+                for name, data in pairs(self.players) do
+                    if data.unit and data.unit:isExist() then
+                        local closeUnits = {}
+
+                        local wr = data.warningRadius
+                        if wr > 0 then
+                            for _,dt in pairs(dect) do
+                                if dt:isExist() then
+                                    local tgtPnt = dt:getPoint()
+                                    local dist = mist.utils.get2DDist(data.unit:getPoint(), tgtPnt)
+                                    if dist <= wr then
+                                        local brg = math.floor(Utils.getBearing(data.unit:getPoint(), tgtPnt))
+
+                                        table.insert(closeUnits, {
+                                            type = dt:getDesc().typeName,
+                                            bearing = brg,
+                                            range = dist,
+                                            altitude = tgtPnt.y
+                                        })
+                                    end
+                                end
+                            end
+                        end
+
+                        env.info("GCI - "..#closeUnits.." enemy units within "..wr.."m of "..name)
+                        if #closeUnits > 0 then
+                            table.sort(closeUnits, function(a, b) return a.range < b.range end)
+
+                            local msg = "GCI Report:\n"
+                            for _,tgt in ipairs(closeUnits) do
+                                msg = msg..'\n'..tgt.type..'  BRA: '..tgt.bearing..' for '
+                                if data.metric then
+                                    msg = msg..math.floor(tgt.range/1000)..'km at '
+                                    msg = msg..(math.floor(tgt.altitude/1000)*1000)..'m'
+                                else
+                                    msg = msg..math.floor(tgt.range/1852)..'nm at '
+                                    msg = msg..(math.floor((tgt.altitude/0.3048)/1000)*1000)..'ft'
+                                end
+                            end
+
+                            trigger.action.outTextForUnit(data.unit:getID(), msg, 19)
+                        end
+                    else
+                        self.players[name] = nil
+                    end
+                end
+            end
+
+            return time+20
+        end, {context = self}, timer.getTime()+6)
+    end
+end
+
+-----------------[[ END OF GCI.lua ]]-----------------
 
