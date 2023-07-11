@@ -11111,7 +11111,7 @@ MissionTracker = {}
 do
     MissionTracker.maxMissionCount = {
         [Mission.types.cap_easy] = 1,
-        [Mission.types.cap_medium] = 1,
+        [Mission.types.cap_medium] = 2, -- Edited, increase max CAP mission count, default = 1
         [Mission.types.cas_easy] = 1,
         [Mission.types.cas_medium] = 1,
         [Mission.types.cas_hard] = 1,
@@ -11124,7 +11124,7 @@ do
         [Mission.types.strike_hard] = 1,
         [Mission.types.dead] = 1,
         [Mission.types.escort] = 1,
-        [Mission.types.tarcap] = 1,
+        [Mission.types.tarcap] = 2, -- Edited, increase max CAP mission count, default = 1
         [Mission.types.recon_plane] = 1,
         [Mission.types.recon_plane_deep] = 1,
         [Mission.types.deep_strike] = 3,
@@ -11136,7 +11136,7 @@ do
         [Mission.types.deploy_squad] =1,
     }
 
-    MissionTracker.missionBoardSize = 10
+    MissionTracker.missionBoardSize = 12 -- Edited, increase overall max mission count, default = 10
 
 	function MissionTracker:new(playerTracker, markerCommands)
 		local obj = {}
