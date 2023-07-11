@@ -11066,9 +11066,9 @@ RewardDefinitions = {}
 
 do
     RewardDefinitions.missions = {
-      [Mission.types.cap_easy]        = { xp = { low = 10, high = 20, boost = 0   } },
-      [Mission.types.cap_medium]      = { xp = { low = 10, high = 20, boost = 100 } },
-      [Mission.types.tarcap]          = { xp = { low = 10, high = 10, boost = 150 } },
+      [Mission.types.cap_easy]        = { xp = { low = 20, high = 25, boost = 0   } }, -- Edited, increase CAP mission awards, default = 10, 20, 0
+      [Mission.types.cap_medium]      = { xp = { low = 20, high = 25, boost = 100 } }, -- Edited, increase CAP mission awards, default = 10, 20, 100
+      [Mission.types.tarcap]          = { xp = { low = 20, high = 25, boost = 150 } }, -- Edited, increase CAP mission awards, default = 10, 10, 150
       [Mission.types.cas_easy]        = { xp = { low = 10, high = 20, boost = 0   } },
       [Mission.types.cas_medium]      = { xp = { low = 20, high = 30, boost = 0   } },
       [Mission.types.cas_hard]        = { xp = { low = 30, high = 40, boost = 0   } },
@@ -11083,7 +11083,7 @@ do
       [Mission.types.recon_plane]     = { xp = { low = 20, high = 30, boost = 0   } },
       [Mission.types.recon_plane_deep]= { xp = { low = 30, high = 40, boost = 0   } },
       [Mission.types.anti_runway]     = { xp = { low = 20, high = 30, boost = 25  } },
-      [Mission.types.supply_easy]     = { xp = { low = 10, high = 20, boost = 0   } },
+      [Mission.types.supply_easy]     = { xp = { low = 15, high = 25, boost = 0   } }, -- Edited, increase supply mission awards, default = 10, 20, 0
       [Mission.types.supply_hard]     = { xp = { low = 20, high = 30, boost = 0   } },
       [Mission.types.escort]          = { xp = { low = 20, high = 30, boost = 0   } },
       [Mission.types.scout_helo]      = { xp = { low = 20, high = 30, boost = 0   } },
