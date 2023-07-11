@@ -132,9 +132,9 @@ end
 local last_time = 0
 
 local function mission_restart_check()
-    -- Check mission restart flag every 15 seconds
+    -- Check mission restart flag every second
     local current_time = DCS.getModelTime()
-    if current_time < last_time + 15 then
+    if current_time < last_time + 1 then
         return
     end
 
