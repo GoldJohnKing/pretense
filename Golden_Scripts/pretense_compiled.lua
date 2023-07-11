@@ -3866,9 +3866,9 @@ do
 								self.currentBuild.product.missionType == ZoneCommand.missionTypes.supply_transfer then
 								step = math.floor(ZoneCommand.supplyBuildSpeed * self.boostScale)
 
-								if self.currentBuild.product.missionType == ZoneCommand.missionTypes.supply_transfer then
-									step = math.floor(step*2)
-								end
+								-- if self.currentBuild.product.missionType == ZoneCommand.missionTypes.supply_transfer then -- Edited, slow down supply transfer build speed
+								-- 	step = math.floor(step*2)
+								-- end
 							end
 						end
 						
