@@ -12514,7 +12514,7 @@ do
                     if u:isExist() then
                         local detected = u:getController():getDetectedTargets(Controller.Detection.RADAR)
                         for _,d in ipairs(detected) do
-                            if d.object:isExist() and 
+                            if d and d.object and d.object.isExist and d.object:isExist() and 
                                 d.object:getCategory() == Object.Category.UNIT and
                                 d.object.getCoalition and
                                 d.object:getCoalition() == self.tgtSide then
