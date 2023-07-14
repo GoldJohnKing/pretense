@@ -5952,7 +5952,7 @@ do
 		end, {context = self}, timer.getTime()+10)
 
 		timer.scheduleFunction(function(param, time)
-			local x = math.random(-30,70) -- the lower limit benefits blue, higher limit benefits red, adjust to increase limit of random boost variance, default (-50,50) -- Edited, benefit red more, default = -50,50
+			local x = math.random(-25,75) -- the lower limit benefits blue, higher limit benefits red, adjust to increase limit of random boost variance, default (-50,50) -- Edited, benefit red more, default = -50,50
 			local boostIntensity = Config.randomBoost -- adjusts the intensity of the random boost variance, default value = 0.0004
 			local factor = (x*x*x*boostIntensity)/100  -- the farther x is the higher the factor, negative beneifts blue, pozitive benefits red
 			param.context.boostScale[1] = 1.0+factor
