@@ -2383,7 +2383,17 @@ do
 						end
 					end
 				end
-			end
+			elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
+                local player = event.initiator:getPlayerName()
+				if player then
+					local groupid = event.initiator:getGroup():getID()
+					
+					if context.groupMenus[groupid] then
+						missionCommands.removeItemForGroup(groupid, context.groupMenus[groupid])
+						context.groupMenus[groupid] = nil
+					end
+				end
+            end
 		end, self)
 
 		local ev = {}
@@ -3145,7 +3155,7 @@ do
 								table.insert(remaining, sq)
 							elseif zn.side ~= un:getCoalition() then
 								trigger.action.outTextForUnit(un:getID(), 'Can only unload extracted infantry while within a friendly zone', 10)
-								table.insert(remining, sq)
+								table.insert(remaining, sq)
 							else
 								trigger.action.outTextForUnit(un:getID(), 'Infantry recovered', 10)
 								zn:addResource(200)
@@ -6332,7 +6342,17 @@ do
                         context.groupMenus[groupid] = menu
                     end
 				end
-			end
+			elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
+                local player = event.initiator:getPlayerName()
+				if player then
+					local groupid = event.initiator:getGroup():getID()
+					
+                    if context.groupMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupMenus[groupid])
+                        context.groupMenus[groupid] = nil
+                    end
+				end
+            end
 		end, self)
 
         MenuRegistry:register(4, function(event, context)
@@ -6372,7 +6392,22 @@ do
                         end
                     end
 				end
-			end
+			elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
+                local player = event.initiator:getPlayerName()
+				if player then
+					local groupid = event.initiator:getGroup():getID()
+					
+                    if context.groupShopMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupShopMenus[groupid])
+                        context.groupShopMenus[groupid] = nil
+                    end
+
+                    if context.groupTgtMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupTgtMenus[groupid])
+                        context.groupTgtMenus[groupid] = nil
+                    end
+				end
+            end
 		end, self)
 		
         self.markerCommands:addCommand('stats',function(event, _, state) 
@@ -7413,6 +7448,7 @@ do
         return {
             ["type"] = unitType,
             ["skill"] = skill,
+            ["coldAtStart"] = false,
             ["x"] = nudgedPos.x,
             ["y"] = nudgedPos.y,
             ["name"] = name,
@@ -11678,18 +11714,15 @@ do
                         missionCommands.addCommandForGroup(groupid, 'Active Mission', menu, Utils.log(context.printActiveMission), context, nil, groupid, nil, groupname)
                         
                         local dial = missionCommands.addSubMenuForGroup(groupid, 'Dial Code', menu)
-                        for i1=1,9,1 do
+                        for i1=1,5,1 do
                             local digit1 = missionCommands.addSubMenuForGroup(groupid, i1..'___', dial)
-                            for i2=1,9,1 do
+                            for i2=1,5,1 do
                                 local digit2 = missionCommands.addSubMenuForGroup(groupid, i1..i2..'__', digit1)
-                                for i3=1,9,1 do
+                                for i3=1,5,1 do
                                     local digit3 = missionCommands.addSubMenuForGroup(groupid, i1..i2..i3..'_', digit2)
-                                    for i4=1,9,1 do
-                                        local digit4 = missionCommands.addSubMenuForGroup(groupid, i1..i2..i3..i4, digit3)
-                                        
+                                    for i4=1,5,1 do
                                         local code = tonumber(i1..i2..i3..i4)
-                                        missionCommands.addCommandForGroup(groupid, 'Accept', digit4, Utils.log(context.activateMissionForGroup), context, code, groupname)
-                                        missionCommands.addCommandForGroup(groupid, 'Join', digit4, Utils.log(context.joinMissionForGroup), context, code, groupname)
+                                        local digit4 = missionCommands.addCommandForGroup(groupid, i1..i2..i3..i4, digit3, Utils.log(context.activateOrJoinMissionForGroup), context, code, groupname)
                                     end
                                 end
                             end
@@ -11704,7 +11737,17 @@ do
                         context.groupMenus[groupid] = menu
                     end
 				end
-			end
+			elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
+                local player = event.initiator:getPlayerName()
+				if player then
+					local groupid = event.initiator:getGroup():getID()
+					
+					if context.groupMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupMenus[groupid])
+                        context.groupMenus[groupid] = nil
+                    end
+				end
+            end
         end, self)
     end
 
@@ -11814,8 +11857,8 @@ do
 
     function MissionTracker:getNewMissionID()
         if #self.missionIDPool == 0 then
-            for i=1111,9999,1 do 
-                if not tostring(i):find('0') then
+            for i=1111,5555,1 do 
+                if not tostring(i):find('[06789]') then
                     if not self.missionBoard[i] and not self.activeMissions[i] then
                         table.insert(self.missionIDPool, i)
                     end
@@ -12168,13 +12211,18 @@ do
         end
     end
 
-    function MissionTracker:activateMissionForGroup(code, groupname)
+    function MissionTracker:activateOrJoinMissionForGroup(code, groupname)
         if groupname then
-            env.info('MissionTracker - activateMissionForGroup: '..tostring(groupname)..' requested activate '..code)
+            env.info('MissionTracker - activateOrJoinMissionForGroup: '..tostring(groupname)..' requested activate or join '..code)
             local gr = Group.getByName(groupname)
             for i,v in ipairs(gr:getUnits()) do
                 if v.getPlayerName and v:getPlayerName() then 
-                    self:activateMission(code, v:getPlayerName(), v)
+                    local mis = self.activeMissions[code]
+                    if mis then 
+                        self:joinMission(code, v:getPlayerName(), v)
+                    else
+                        self:activateMission(code, v:getPlayerName(), v)
+                    end
                     return
                 end
             end
@@ -12229,19 +12277,6 @@ do
         env.info('Mission code'..mis.missionID..' accepted by '..player)
         self.activeMissions[mis.missionID] = mis
         return true
-    end
-
-    function MissionTracker:joinMissionForGroup(code, groupname)
-        if groupname then
-            env.info('MissionTracker - joinMissionForGroup: '..tostring(groupname)..' requested join '..code)
-            local gr = Group.getByName(groupname)
-            for i,v in ipairs(gr:getUnits()) do
-                if v.getPlayerName and v:getPlayerName() then 
-                    self:joinMission(code, v:getPlayerName(), v)
-                    return
-                end
-            end
-        end
     end
 
     function MissionTracker:joinMission(code, player, unit)
@@ -12882,7 +12917,17 @@ do
                         context.groupMenus[groupid] = menu
                     end
 				end
-			end
+            elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
+                local player = event.initiator:getPlayerName()
+				if player then
+					local groupid = event.initiator:getGroup():getID()
+					
+                    if context.groupMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupMenus[groupid])
+                        context.groupMenus[groupid] = nil
+                    end
+				end
+            end
 		end, self)
 
         timer.scheduleFunction(function(param, time)
@@ -12972,15 +13017,30 @@ do
                             table.sort(closeUnits, function(a, b) return a.range < b.range end)
 
                             local msg = "GCI Report:\n"
+                            local count = 0
                             for _,tgt in ipairs(closeUnits) do
-                                msg = msg..'\n'..tgt.type..'  BRA: '..tgt.bearing..' for '
                                 if data.metric then
-                                    msg = msg..math.floor(tgt.range/1000)..'km at '
-                                    msg = msg..(math.floor(tgt.altitude/1000)*1000)..'m'
+                                    local km = tgt.range/1000
+                                    if km < 1 then
+                                        msg = msg..'\n'..tgt.type..'  MERGED'
+                                    else
+                                        msg = msg..'\n'..tgt.type..'  BRA: '..tgt.bearing..' for '
+                                        msg = msg..math.floor(km)..'km at '
+                                        msg = msg..(math.floor(tgt.altitude/1000)*1000)..'m'
+                                    end
                                 else
-                                    msg = msg..math.floor(tgt.range/1852)..'nm at '
-                                    msg = msg..(math.floor((tgt.altitude/0.3048)/1000)*1000)..'ft'
+                                    local nm = tgt.range/1852
+                                    if nm < 1 then
+                                        msg = msg..'\n'..tgt.type..'  MERGED'
+                                    else
+                                        msg = msg..'\n'..tgt.type..'  BRA: '..tgt.bearing..' for '
+                                        msg = msg..math.floor(nm)..'nm at '
+                                        msg = msg..(math.floor((tgt.altitude/0.3048)/1000)*1000)..'ft'
+                                    end
                                 end
+                                
+                                count = count + 1
+                                if count >= 10 then break end
                             end
 
                             trigger.action.outTextForUnit(data.unit:getID(), msg, 19)
