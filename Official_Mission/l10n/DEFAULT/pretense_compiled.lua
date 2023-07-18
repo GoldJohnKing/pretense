@@ -97,6 +97,10 @@ do
 		local pt = object:getPoint()
 		return pt.y - land.getHeight({ x = pt.x, y = pt.z })
 	end
+
+	function Utils.round(number)
+		return math.floor(number+0.5)
+	end
 	
 	function Utils.isLanded(unit, ignorespeed)
 		--return (Utils.getAGL(unit)<5 and mist.vec.mag(unit:getVelocity())<0.10)
@@ -842,6 +846,44 @@ do
 					if not GroupMonitor.hasWeapons(gr) then
 						env.info('GroupMonitor: processAir ['..group.name..'] size ['..gr:getSize()..'] has no weapons outside of shells')
 						self:sendHome(group)
+					elseif group.product.missionType == ZoneCommand.missionTypes.cas_helo then 
+						local frUnit = gr:getUnit(1)
+						local controller = frUnit:getController()
+						local targets = controller:getDetectedTargets()
+
+						local tgtToEngage = {}
+						if #targets > 0 then
+							for _,tgt in ipairs(targets) do
+								if tgt.visible and tgt.object and tgt.object.isExist and tgt.object:isExist() then
+									if tgt.object.getCategory and tgt.object:getCategory() == Object.Category.UNIT and 
+										tgt.object.getCoalition and tgt.object:getCoalition()~=frUnit:getCoalition() and 
+										tgt.object:getDesc().category == Unit.Category.GROUND_UNIT then
+
+										local dist = mist.utils.get3DDist(frUnit:getPoint(), tgt.object:getPoint())
+										if dist < 2000 then
+											table.insert(tgtToEngage, tgt.object)
+										end
+									end
+								end
+							end
+						end
+
+						if not group.isengaging and #tgtToEngage > 0 then
+							env.info('GroupMonitor: processAir ['..group.name..'] engaging targets')
+							TaskExtensions.heloEngageTargets(gr, tgtToEngage, group.product.expend)
+							group.isengaging = true
+							group.startedEngaging = timer.getAbsTime()
+						elseif group.isengaging and #tgtToEngage == 0 and group.startedEngaging and (timer.getAbsTime() - group.startedEngaging) > 60 then
+							env.info('GroupMonitor: processAir ['..group.name..'] resuming mission')
+							if group.returning then
+								group.returning = nil
+								self:sendHome(group)
+							else
+								local homePos = group.home.zone.point
+								TaskExtensions.executeHeloCasMission(gr, group.target.built, group.product.expend, group.product.altitude, {homePos = homePos})
+							end
+							group.isengaging = false
+						end
 					end
 				elseif group.product.missionType == 'supply_air' then
 					if not group.returning and group.target and group.target.side ~= group.product.side and group.target.side ~= 0 then
@@ -1322,7 +1364,42 @@ do
 		TaskExtensions.setDefaultAG(group)
 	end
 
-	function TaskExtensions.executeHeloCasMission(group, targets, expend, altitude, landatparking, reactivated)
+	function TaskExtensions.heloEngageTargets(group, targets, expend)
+		if not group then return end
+		if not group:isExist() or group:getSize()==0 then return end
+		local startPos = group:getUnit(1):getPoint()
+
+		local attack = {
+			id = 'ComboTask',
+			params = {
+				tasks = {
+				}
+			}
+		}
+
+		local expCount = AI.Task.WeaponExpend.ONE
+		if expend then
+			expCount = expend
+		end
+		
+		for i,v in pairs(targets) do
+			local task = { 
+				id = 'AttackUnit', 
+				params = { 
+					unitId = v:getID(),
+					expend = expend,
+					weaponType = Weapon.flag.AnyWeapon,
+					groupAttack = true
+				} 
+			}
+
+			table.insert(attack.params.tasks, task)
+		end
+
+		group:getController():pushTask(attack)
+	end
+
+	function TaskExtensions.executeHeloCasMission(group, targets, expend, altitude, reactivated)
 		if not group then return end
 		if not group:isExist() or group:getSize()==0 then return end
 		local startPos = group:getUnit(1):getPoint()
@@ -1421,18 +1498,6 @@ do
 			alt_type = AI.Task.AltitudeType.RADIO, 
 			task = land
 		})
-
-		if landatparking then
-			mis.params.route.points[3] = {
-				type= AI.Task.WaypointType.LAND,
-				x = startPos.x,
-				y = startPos.z,
-				speed = 257,
-				action = AI.Task.TurnMethod.FIN_POINT,
-				alt = 0,
-				alt_type = AI.Task.AltitudeType.RADIO
-			}
-		end
 		
 		group:getController():setTask(mis)
 		TaskExtensions.setDefaultAG(group)
@@ -1498,6 +1563,7 @@ do
 				pattern = AI.Task.OrbitPattern.RACE_TRACK,
 				point = pos1,
    				point2 = pos2,
+				speed = 143,
 				altitude = alt
 			}
 		}
@@ -1559,7 +1625,7 @@ do
 			type= AI.Task.WaypointType.TURNING_POINT,
 			x = pos1.x,
 			y = pos1.y,
-			speed = 450,
+			speed = 143,
 			action = AI.Task.TurnMethod.FLY_OVER_POINT,
 			alt = alt,
 			alt_type = AI.Task.AltitudeType.BARO,
@@ -1577,7 +1643,7 @@ do
 			type= AI.Task.WaypointType.TURNING_POINT,
 			x = pos2.x,
 			y = pos2.y,
-			speed = 450,
+			speed = 143,
 			action = AI.Task.TurnMethod.FLY_OVER_POINT,
 			alt = alt,
 			alt_type = AI.Task.AltitudeType.BARO,
@@ -4702,7 +4768,7 @@ do
 			timer.scheduleFunction(function(param)
 				local gr = Group.getByName(param.prod.name)
 				if param.helo then
-					TaskExtensions.executeHeloCasMission(gr, param.targets, param.prod.expend, param.prod.altitude, param.landatparking, {homePos = homePos})
+					TaskExtensions.executeHeloCasMission(gr, param.targets, param.prod.expend, param.prod.altitude, {homePos = homePos})
 				else
 					TaskExtensions.executeCasMission(gr, param.targets, param.prod.expend, param.prod.altitude, {homePos = homePos})
 				end
@@ -5664,7 +5730,7 @@ do
 			timer.scheduleFunction(function(param)
 				local gr = Group.getByName(param.prod.name)
 				if param.helo then
-					TaskExtensions.executeHeloCasMission(gr, param.targets, param.prod.expend, param.prod.altitude, param.landatparking)
+					TaskExtensions.executeHeloCasMission(gr, param.targets, param.prod.expend, param.prod.altitude)
 				else
 					TaskExtensions.executeCasMission(gr, param.targets, param.prod.expend, param.prod.altitude)
 				end
@@ -6259,6 +6325,11 @@ do
                 local nxt = self:getRank(self.stats[player][stattype] + amount)
                 if nxt and cur.rank < nxt.rank then
                     trigger.action.outText(player..' has leveled up to rank: '..nxt.name, 10)
+                    if nxt.cmdAward and nxt.cmdAward > 0 then
+                        self:addStat(player, nxt.cmdAward, PlayerTracker.statTypes.cmd)
+                        trigger.action.outText(player.." awarded "..nxt.cmdAward.." CMD tokens", 10)
+                        env.info("PlayerTracker.addStat - Awarded "..player.." "..nxt.cmdAward.." CMD tokens for rank up to "..nxt.name)
+                    end
                 end
             end
         end
@@ -6625,25 +6696,25 @@ do
     end
 
     PlayerTracker.ranks = {}
-    PlayerTracker.ranks[1] =  { rank=1,  name='E-1 Airman basic',           requiredXP = 0,        cmdChance = 0}
-    PlayerTracker.ranks[2] =  { rank=2,  name='E-2 Airman',                 requiredXP = 2000,     cmdChance = 0}
-    PlayerTracker.ranks[3] =  { rank=3,  name='E-3 Airman first class',     requiredXP = 4500,     cmdChance = 0}
-    PlayerTracker.ranks[4] =  { rank=4,  name='E-4 Senior airman',          requiredXP = 7700,     cmdChance = 0}
-    PlayerTracker.ranks[5] =  { rank=5,  name='E-5 Staff sergeant',         requiredXP = 11800,    cmdChance = 0}
-    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01}
-    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.02}
-    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.03}
-    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.05}
-    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.08}
-    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.10}
-    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.14}
-    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.17}
-    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.22}
-    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.26}
-    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.32}
-    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.37}
-    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.43}
-    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 0.50}
+    PlayerTracker.ranks[1] =  { rank=1,  name='E-1 Airman basic',           requiredXP = 0,        cmdChance = 0,       cmdAward=0}
+    PlayerTracker.ranks[2] =  { rank=2,  name='E-2 Airman',                 requiredXP = 2000,     cmdChance = 0,       cmdAward=0}
+    PlayerTracker.ranks[3] =  { rank=3,  name='E-3 Airman first class',     requiredXP = 4500,     cmdChance = 0,       cmdAward=0}
+    PlayerTracker.ranks[4] =  { rank=4,  name='E-4 Senior airman',          requiredXP = 7700,     cmdChance = 0,       cmdAward=0}
+    PlayerTracker.ranks[5] =  { rank=5,  name='E-5 Staff sergeant',         requiredXP = 11800,    cmdChance = 0,       cmdAward=0}
+    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01,    cmdAward=1}
+    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.02,    cmdAward=1}
+    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.03,    cmdAward=1}
+    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.05,    cmdAward=1}
+    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.08,    cmdAward=2}
+    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.10,    cmdAward=2}
+    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.14,    cmdAward=2}
+    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.17,    cmdAward=2}
+    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.22,    cmdAward=3}
+    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.26,    cmdAward=3}
+    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.32,    cmdAward=3}
+    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.37,    cmdAward=4}
+    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.43,    cmdAward=4}
+    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 0.50,    cmdAward=5}
 
     function PlayerTracker:getPlayerRank(playername)
         if self.stats[playername] then
@@ -7384,6 +7455,8 @@ do
     TemplateDB.templates["tv-tower"] = { type="TV tower", category="Fortifications", shape="tele_bash", dataCategory=TemplateDB.type.static }
 
     TemplateDB.templates["command-center"] = { type=".Command Center", category="Fortifications", shape="ComCenter", dataCategory=TemplateDB.type.static }
+    
+    TemplateDB.templates["military-staff"] = { type="Military staff", category="Fortifications", shape="aviashtab", dataCategory=TemplateDB.type.static }
 end
 
 -----------------[[ END OF TemplateDB.lua ]]-----------------
@@ -7516,6 +7589,14 @@ do
                     }
                 }
             }
+
+            if data.minDist then
+                minDist = data.minDist
+            end
+
+            if data.maxDist then
+                maxDist = data.maxDist
+            end
             
             for i,v in ipairs(data.units) do
                 table.insert(spawnData.units, Spawner.getUnit(v, name.."-"..i, pos, data.skill, minDist, maxDist, surfaceTypes, zone))
@@ -13000,11 +13081,35 @@ do
                                     if dist <= wr then
                                         local brg = math.floor(Utils.getBearing(data.unit:getPoint(), tgtPnt))
 
+                                        local myPos = data.unit:getPosition()
+                                        local tgtPos = dt:getPosition()
+                                        local tgtHeading = math.deg(math.atan2(tgtPos.x.z, tgtPos.x.x))
+                                        local tgtBearing = Utils.getBearing(tgtPos.p, myPos.p)
+            
+                                        local diff = math.abs(Utils.getHeadingDiff(tgtBearing, tgtHeading))
+                                        local aspect = ''
+                                        local priority = 1
+                                        if diff <= 30 then
+                                            aspect = "Hot"
+                                            priority = 1
+                                        elseif diff <= 60 then
+                                            aspect = "Flanking"
+                                            priority = 1
+                                        elseif diff <= 120 then
+                                            aspect = "Beaming"
+                                            priority = 2
+                                        else
+                                            aspect = "Cold"
+                                            priority = 3
+                                        end
+
                                         table.insert(closeUnits, {
                                             type = dt:getDesc().typeName,
                                             bearing = brg,
                                             range = dist,
-                                            altitude = tgtPnt.y
+                                            altitude = tgtPnt.y,
+                                            score = dist*priority,
+                                            aspect = aspect
                                         })
                                     end
                                 end
@@ -13024,8 +13129,9 @@ do
                                         msg = msg..'\n'..tgt.type..'  MERGED'
                                     else
                                         msg = msg..'\n'..tgt.type..'  BRA: '..tgt.bearing..' for '
-                                        msg = msg..math.floor(km)..'km at '
-                                        msg = msg..(math.floor(tgt.altitude/1000)*1000)..'m'
+                                        msg = msg..Utils.round(km)..'km at '
+                                        msg = msg..(Utils.round(tgt.altitude/250)*250)..'m, '
+                                        msg = msg..tostring(tgt.aspect)
                                     end
                                 else
                                     local nm = tgt.range/1852
@@ -13033,8 +13139,9 @@ do
                                         msg = msg..'\n'..tgt.type..'  MERGED'
                                     else
                                         msg = msg..'\n'..tgt.type..'  BRA: '..tgt.bearing..' for '
-                                        msg = msg..math.floor(nm)..'nm at '
-                                        msg = msg..(math.floor((tgt.altitude/0.3048)/1000)*1000)..'ft'
+                                        msg = msg..Utils.round(nm)..'nm at '
+                                        msg = msg..(Utils.round((tgt.altitude/0.3048)/1000)*1000)..'ft, '
+                                        msg = msg..tostring(tgt.aspect)
                                     end
                                 end
                                 
@@ -13056,4 +13163,85 @@ do
 end
 
 -----------------[[ END OF GCI.lua ]]-----------------
+
+
+
+-----------------[[ Starter.lua ]]-----------------
+
+Starter = {}
+do
+    Starter.neutralChance = 0.1
+
+    function Starter.start(zones)
+        if Starter.shouldRandomize() then
+            Starter.randomize(zones)
+        else
+            Starter.normalStart(zones)
+        end
+    end
+
+    function Starter.randomize(zones)
+        local startZones = {}
+        for _,z in pairs(zones) do
+            if z.isHeloSpawn and z.isPlaneSpawn then
+                table.insert(startZones, z)
+            end
+        end
+
+        if #startZones > 0 then
+            local sz = startZones[math.random(1,#startZones)]
+
+            sz:capture(2, true)
+            Starter.captureNeighbours(sz, math.random(1,3))
+        end
+
+        for _,z in pairs(zones) do
+            if z.side == 0 then 
+                if math.random() > Starter.neutralChance then
+                    z:capture(1,true)
+                end
+            end
+
+            if z.side ~= 0 then
+                z:fullUpgrade(math.random(1,30)/100)
+            end
+        end
+    end
+
+    function Starter.captureNeighbours(zone, stepsLeft)
+        if stepsLeft > 0 then
+            for _,v in pairs(zone.neighbours) do
+                if v.side == 0 then
+                    if math.random() > Starter.neutralChance then
+                        v:capture(2,true)
+                    end
+                    Starter.captureNeighbours(v, stepsLeft-1)
+                end
+            end
+        end
+    end
+
+    function Starter.shouldRandomize()
+        if lfs then
+            local filename = lfs.writedir()..'Missions/Saves/randomize.lua'
+            if lfs.attributes(filename) then
+                return true
+            end
+		end
+    end
+
+    function Starter.normalStart(zones)
+        for _,z in pairs(zones) do
+            local i = z.initialState
+            if i then
+                if i.side and i.side ~= 0 then
+                    z:capture(i.side, true)
+                    z:fullUpgrade()
+                end
+            end
+        end
+    end
+end
+
+-----------------[[ END OF Starter.lua ]]-----------------
 

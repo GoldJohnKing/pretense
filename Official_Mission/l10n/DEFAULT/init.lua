@@ -72,6 +72,7 @@ do
 			"Ural-4320T",
 			"2S6 Tunguska"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -84,6 +85,7 @@ do
 			"Gepard",
 			"Gepard"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -101,6 +103,7 @@ do
 			"Tor 9A331",
 			"SNR_75V"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -118,6 +121,7 @@ do
 			"M 818",
 			"Hawk sr"
 		},
+		maxDist = 300,
 		skill = "Good",
 		dataCategory= TemplateDB.type.group
 	}
@@ -139,6 +143,7 @@ do
 			"Patriot ECS",
 			"Patriot AMG"
 		},
+		maxDist = 300,
 		skill = "Good",
 		dataCategory= TemplateDB.type.group
 	}
@@ -153,6 +158,7 @@ do
 			"5p73 s-125 ln",
 			"5p73 s-125 ln"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -169,6 +175,7 @@ do
 			"2S6 Tunguska",
 			"Kub 2P25 ln"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -189,6 +196,7 @@ do
 			"S-300PS 40B6M tr",
 			"S-300PS 64H6E sr"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -206,6 +214,7 @@ do
 			"S-200_Launcher",
 			"S-200_Launcher"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -224,6 +233,7 @@ do
 			"GAZ-66",
 			"SA-11 Buk CC 9S470M1"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -245,6 +255,7 @@ do
 			"NASAMS_Radar_MPQ64F1",
 			"NASAMS_Radar_MPQ64F1"
 		},
+		maxDist = 300,
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
@@ -935,7 +946,7 @@ zones.batumi:defineUpgrades({
                 presets.missions.attack.strike:extend({name='batumi-strike-blue-1', altitude=20000, expend=AI.Task.WeaponExpend.ALL}),
                 presets.missions.patrol.aircraft:extend({name='batumi-patrol-blue-1', altitude=25000, range=25}),
                 presets.missions.support.awacs:extend({name='batumi-awacs-blue', altitude=30000, freq=257.5}),
-                presets.missions.support.tanker:extend({name='batumi-tanker-blue', altitude=25000, freq=257, tacan='37', variant="Basket"})
+                presets.missions.support.tanker:extend({name='batumi-tanker-blue', altitude=25000, freq=257, tacan='37', variant="Drogue"})
             }
         })
     }
@@ -4128,7 +4139,7 @@ zones.nalchik:defineUpgrades({
                 presets.missions.patrol.aircraft:extend({name='nalchik-patrol-red', altitude=25000, range=25}),
                 presets.missions.patrol.aircraft:extend({name='nalchik-patrol-red-2', altitude=25000, range=25}),
                 presets.missions.support.awacs:extend({name='nalchik-awacs-red', altitude=30000, freq=251.2}),
-                presets.missions.support.tanker:extend({name='nalchik-tanker-red', altitude=30000, freq=252.2, tacan='40', variant='Basket'})
+                presets.missions.support.tanker:extend({name='nalchik-tanker-red', altitude=30000, freq=252.2, tacan='40', variant='Drogue'})
             }
         })
     },
@@ -4454,15 +4465,7 @@ if pm:canRestore() then
 	pm:restoreSquads()
 else
 	--initial states
-	for _,z in pairs(zones) do
-		local i = z.initialState
-		if i then
-			if i.side and i.side ~= 0 then
-				z:capture(i.side, true)
-				z:fullUpgrade()
-			end
-		end
-	end
+	Starter.start(zones)
 end
 
 timer.scheduleFunction(function(param, time)
