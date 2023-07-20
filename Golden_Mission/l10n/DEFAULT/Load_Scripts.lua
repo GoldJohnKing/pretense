@@ -7,7 +7,6 @@ local script_list =
     "config_override.lua",
     "pretense_compiled.lua",
     "init.lua",
-    "unlock_slots_in_zones.lua",
     "restart_timer.lua",
 }
 
