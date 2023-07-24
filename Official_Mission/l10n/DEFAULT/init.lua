@@ -2978,6 +2978,7 @@ zones.annasiriyah:defineUpgrades({
 zones.jasim = ZoneCommand:new("Jasim")
 zones.jasim.initialState = { side = 1 }
 zones.jasim.maxResource = 20000
+zones.jasim.isHeloSpawn = true
 zones.jasim:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
