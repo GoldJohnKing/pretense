@@ -1,4 +1,27 @@
+--[[
+Pretense Dynamic Mission Engine
+## Description:
 
+Pretense Dynamic Mission Engine (PDME) is a the heart and soul of the Pretense missions.
+You are allowed to use and modify this script for personal or private use.
+Please do not share modified versions of this script.
+Please do not reupload missions that use this script.
+Please do not charge money for access to missions using this script.
+
+## Links:
+
+ED Forums Post: <https://forum.dcs.world/topic/327483-pretense-dynamic-campaign>
+
+Pretense Manual: <https://github.com/Dzsek/pretense>
+
+If you'd like to buy me a beer: <https://www.buymeacoffee.com/dzsek>
+
+Makes use of Mission scripting tools (Mist): <https://github.com/mrSkortch/MissionScriptingTools>
+
+@script PDME
+@author Dzsekeb
+
+]]--
 
 -----------------[[ Config.lua ]]-----------------
 
@@ -795,16 +818,16 @@ do
 			if timer.getAbsTime() - group.lastStateTime > GroupMonitor.blockedDespawnTime then
 				if gr and Utils.allGroupIsLanded(gr) then
 					env.info('GroupMonitor: processAir ['..group.name..'] is blocked, despawning')
-					--local frUnit = gr:getUnit(1)
-					--if frUnit then
-						--local firstUnit = frUnit:getName()
-						--local z = ZoneCommand.getZoneOfUnit(firstUnit)
-						--if z then
-							--z:addResource(group.product.cost)
-							--env.info('GroupMonitor: processAir ['..z.name..'] has recovered ['..group.product.cost..'] from ['..group.name..']')
-						--end
-					--end
-					
+					local frUnit = gr:getUnit(1)
+					if frUnit then
+						local firstUnit = frUnit:getName()
+						local z = ZoneCommand.getZoneOfUnit(firstUnit)
+						if z then
+							z:addResource(group.product.cost)
+							env.info('GroupMonitor: processAir ['..z.name..'] has recovered ['..group.product.cost..'] from ['..group.name..']')
+						end
+					end
+
 					gr:destroy()
 					return true
 				end
@@ -1563,7 +1586,7 @@ do
 				pattern = AI.Task.OrbitPattern.RACE_TRACK,
 				point = pos1,
    				point2 = pos2,
-				speed = 143,
+				speed = 195,
 				altitude = alt
 			}
 		}
@@ -1625,7 +1648,7 @@ do
 			type= AI.Task.WaypointType.TURNING_POINT,
 			x = pos1.x,
 			y = pos1.y,
-			speed = 143,
+			speed = 195,
 			action = AI.Task.TurnMethod.FLY_OVER_POINT,
 			alt = alt,
 			alt_type = AI.Task.AltitudeType.BARO,
@@ -1643,7 +1666,7 @@ do
 			type= AI.Task.WaypointType.TURNING_POINT,
 			x = pos2.x,
 			y = pos2.y,
-			speed = 143,
+			speed = 195,
 			action = AI.Task.TurnMethod.FLY_OVER_POINT,
 			alt = alt,
 			alt_type = AI.Task.AltitudeType.BARO,
@@ -5266,7 +5289,7 @@ do
 	function ZoneCommand:isAwacsMissionValid(product, target)
 		if target.side ~= product.side then return false end
 		if target.name == self.name then return false end
-		if not target.distToFront or target.distToFront ~= 3 then return false end
+		if not target.distToFront or target.distToFront ~= 4 then return false end
 		
 		return true
 	end
@@ -5316,7 +5339,7 @@ do
 	function ZoneCommand:isTankerMissionValid(product, target)
 		if target.side ~= product.side then return false end
 		if target.name == self.name then return false end
-		if not target.distToFront or target.distToFront ~= 3 then return false end
+		if not target.distToFront or target.distToFront ~= 4 then return false end
 		
 		return true
 	end
@@ -9697,6 +9720,10 @@ do
         end
     end
 
+    function Mission:isInstantReward()
+        return false
+    end
+
     function Mission:hasPlayers()
         return Utils.getTableSize(self.players) > 0
     end
@@ -10486,6 +10513,10 @@ do
         return "Supply delivery"
     end
 
+    function Supply_Easy:isInstantReward()
+        return true
+    end
+
     function Supply_Easy:isUnitTypeAllowed(unit)
         if PlayerLogistics then
             local unitType = unit:getDesc()['typeName']
@@ -10544,6 +10575,10 @@ do
 
     function Supply_Hard:getMissionName()
         return "Supply delivery"
+    end
+
+    function Supply_Hard:isInstantReward()
+        return true
     end
 
     function Supply_Hard:isUnitTypeAllowed(unit)
@@ -11403,6 +11438,10 @@ do
         return 'CSAR'
     end
 
+    function CSAR:isInstantReward()
+        return true
+    end
+
     function CSAR:isUnitTypeAllowed(unit)
         if PlayerLogistics then
             local unitType = unit:getDesc()['typeName']
@@ -11460,7 +11499,11 @@ do
 
     function Extraction:getMissionName()
         return 'Extraction'
-    end    
+    end
+
+    function Extraction:isInstantReward()
+        return true
+    end
     
     function Extraction:isUnitTypeAllowed(unit)
         if PlayerLogistics then
@@ -11533,7 +11576,22 @@ do
 
     function DeploySquad:getMissionName()
         return 'Deploy infantry'
-    end    
+    end
+
+    function DeploySquad:isInstantReward()
+        local friendlyDeployments = {
+            [PlayerLogistics.infantryTypes.engineer] = true,
+        }
+
+        if self.objectives and self.objectives[1] then
+            local sqType = self.objectives[1].param.squadType
+            if friendlyDeployments[sqType] then
+                return true
+            end
+        end
+
+        return false
+    end
     
     function DeploySquad:isUnitTypeAllowed(unit)
         if PlayerLogistics then
@@ -12056,39 +12114,32 @@ do
                     elseif mis.state == Mission.states.active then
                         mis:updateObjectives()
                     elseif mis.state == Mission.states.completed then
-                        if mis.type == Mission.types.supply_easy or 
-                            mis.type == Mission.types.supply_hard or
-                            mis.type == Mission.types.extraction or
-                            mis.type == Mission.types.deploy_squad or
-                            mis.type == Mission.types.csar then
-                                mis:pushMessageToPlayers(mis.name..' mission complete.', 60)
-                                mis:pushSoundToPlayers("success.ogg")
-                                for _,reward in ipairs(mis.rewards) do
-                                    for p,u in pairs(mis.players) do
-                                        if reward.type == PlayerTracker.statTypes.xp then
-                                            param.playerTracker:addStat(p, reward.amount, PlayerTracker.statTypes.xp)
-                                        end
-
-                                    end
-                                    mis:pushMessageToPlayers('+'..reward.amount..' '..reward.type)
-                                end
-
-                                for p,u in pairs(mis.players) do
-                                    param.playerTracker:addRankRewards(p,u, false)
-                                end
+                        local isInstant = mis:isInstantReward()
+                        if isInstant then
+                            mis:pushMessageToPlayers(mis.name..' mission complete.', 60)
                         else
                             mis:pushMessageToPlayers(mis.name..' mission complete. Land to claim rewards.', 60)
-                            mis:pushSoundToPlayers("success.ogg")
-                            for _,reward in ipairs(mis.rewards) do
-                                for p,_ in pairs(mis.players) do
+                        end 
+
+                        for _,reward in ipairs(mis.rewards) do
+                            for p,_ in pairs(mis.players) do
+                                if isInstant then
+                                    param.playerTracker:addStat(p, reward.amount, reward.type)
+                                else
                                     param.playerTracker:addTempStat(p, reward.amount, reward.type)
                                 end
                             end
 
-                            for p,u in pairs(mis.players) do
-                                param.playerTracker:addRankRewards(p,u, true)
+                            if isInstant then
+                                mis:pushMessageToPlayers('+'..reward.amount..' '..reward.type)
                             end
                         end
+
+                        for p,u in pairs(mis.players) do
+                            param.playerTracker:addRankRewards(p,u, not isInstant)
+                        end
+
+                        mis:pushSoundToPlayers("success.ogg")
                         param.activeMissions[code] = nil
                         env.info('Mission code'..code..' removed due to completion')
                     elseif mis.state == Mission.states.failed then
