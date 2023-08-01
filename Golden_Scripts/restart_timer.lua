@@ -35,8 +35,8 @@ local missionCompleteCheckScheduler = nil
 
 local missionCompleteCheck = function(event, sender)
     if BattlefieldManager.noRedZones or BattlefieldManager.noBlueZones then
-        local restartTime = 1800 -- 30 minutes
-        local restartHintTimeList = { 60, 180, 300, 600, 900, 1200, 1500, 1800 }
+        local restartTime = 900 -- 15 minutes
+        local restartHintTimeList = { 60, 180, 300, 600, 900 }
         local restartFlag = "FLAG_MISSION_RESTART"
         local restartHint = "服务器将于 %d 分钟后清档重启！"
 
@@ -48,7 +48,7 @@ local missionCompleteCheck = function(event, sender)
             end
 
             trigger.action.setUserFlag("FLAG_MISSION_RESTART", true)
-        end, {}, timer.getTime() + restartTime)
+        end, {}, timer.getTime() + restartTime + 15) -- Add 15s offset to avoid conflict with saving system
 
         mist.removeFunction(missionCompleteCheckScheduler)
     end
