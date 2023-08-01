@@ -104,66 +104,6 @@ local function kick_user_to_spectator(_player_id, _resaon)
 end
 
 
--- Mission restart check
-
-local mission_restart_flag = "FLAG_MISSION_RESTART"
-
-local mission_list = {
-    ["Pretense_冷战叙利亚_春季_晴朗_1500"] = 3,
-    ["Pretense_冷战叙利亚_夏季_无风_1500"] = 3,
-    ["Pretense_冷战叙利亚_夏季_酷热_0600"] = 2,
-    ["Pretense_冷战叙利亚_秋季_晴朗_1200"] = 3,
-    ["Pretense_冷战叙利亚_秋季_下雨_0900"] = 3,
-    ["Pretense_冷战叙利亚_冬季_强风_1200"] = 2,
-    ["Pretense_冷战叙利亚_冬季_下雪_0900"] = 3,
-    ["Pretense_冷战叙利亚_夜间_无风_0000"] = 1,
-}
-
-local function get_random(tb)
-    local keys = {}
-
-    for key, value in pairs(tb) do
-        table.insert(keys, key)
-    end
-
-    return tb[keys[math.random(#keys)]]
-end
-
-local last_time = 0
-
-local function mission_restart_check()
-    -- Check mission restart flag every second
-    local current_time = DCS.getModelTime()
-    if current_time < last_time + 1 then
-        return
-    end
-
-    last_time = current_time
-
-    -- Check mission restart flag
-    local status, error = net.dostring_in("server", "return trigger.misc.getUserFlag(\"" .. mission_restart_flag .. "\")")
-    if status and tonumber(status) == 0 then
-        return
-    end
-
-    -- Get a random mission
-    local current_mission = DCS.getMissionFilename()
-    local active_mission_list = {}
-    for key, value in pairs(mission_list) do
-        if key ~= current_mission then
-            for i = 1, value do
-                table.insert(active_mission_list, key)
-            end
-        end
-    end
-
-    local selected_mission = get_random(active_mission_list)
-
-    -- Restart mission
-    net.load_mission(lfs.writedir() .. "Missions/" .. selected_mission .. ".miz")
-end
-
-
 -- Set user callbacks
 
 local user_callbacks = {}
@@ -185,11 +125,6 @@ end
 -- This will trigger once player connect to server
 function user_callbacks.onPlayerConnect(_player_id)
     vip_reset(_player_id)
-end
-
--- This will trigger on every frame
-function user_callbacks.onSimulationFrame()
-    mission_restart_check()
 end
 
 DCS.setUserCallbacks(user_callbacks)
