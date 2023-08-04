@@ -7,8 +7,9 @@ local script_list =
     "config_override.lua",
     "pretense_compiled.lua",
     "init.lua",
-    "unlock_slots_in_zones.lua",
     "restart_timer.lua",
+    "Splash_Damage_2_0.lua",
+    -- "unlock_slots_in_zones.lua",
 }
 
 local function load_scripts(path, list)
