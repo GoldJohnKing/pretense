@@ -236,7 +236,7 @@ Each crate dropped is loaded with as many supplies as possible up to its maximum
 Example:
 - 3 crates on board and 15000 supplies loaded
 - First crate dropped contains 9000 supplies, aircraft left with 6000 suppies
-- Second crate dropped contains 5000 supplies, aircraft left with 0 supplies
+- Second crate dropped contains 6000 supplies, aircraft left with 0 supplies
 - Third crate dropped contains 0 supplies, aircraft still at 0 supplies
 
 Infantry squads can be deployed the same way. Each dropped crate will auto select one of the loaded infantry squads. You can prepare a specific squad manually using the `Other->Logistics->Loadmaster` option in the radio menu. After your prepared squad is dropped, the next one will be auto selected again, unless you prepare a new one.
@@ -695,3 +695,15 @@ If I will, I wont tell you about it unless it's close to release.
 - Deploy Squad mission now only gives instant rewards when deploying Engineers
 - Removed fuel tanks from MB-339 AIs on Kiryat to allow it to take off on the short runway.
 - Marked Jasim as a spawn point
+
+### Caucasus V1.3.4 - 2 Aug 2023
+
+- Fixed crash when CSAR target despawns or is destroyed mid mission
+- Added message for when Hercules cargo drop fails due to the crate crashing into something
+
+### Syria V1.0.2 - 2 Aug 2023
+
+- Fixed crash when CSAR target despawns or is destroyed mid mission
+- Adjusted spawn pos of El Taebah convoys to reduce chance of blockage
+- Adjusted client Su-25 at Kiryat to stop it from rolling off the taxiway on spawn
+- Added message for when Hercules cargo drop fails due to the crate crashing into something
