@@ -1,19 +1,23 @@
 -- Server Restart Timer Function
 
-local function restartTimer(restartTime, restartHintTimeList, restartFlag, restartHint, restartHintLastsTime)
+local function restartTimer(restartTime, restartHintTimeList, restartFlag, restartHint, restartHintLastsTime, deleteSave, savePath)
     for key, value in pairs(restartHintTimeList) do -- Restart hint
-        mist.scheduleFunction(function(event, sender)
+        mist.scheduleFunction(function()
             trigger.action.outText(string.format(restartHint, value / 60), restartHintLastsTime)
         end, {}, timer.getTime() + restartTime - value)
     end
 
-    mist.scheduleFunction(function(event, sender)
+    mist.scheduleFunction(function()
         trigger.action.outText("服务器即将重启！", 180)
     end, {}, timer.getTime() + restartTime - 15)
 
-    mist.scheduleFunction(function(event, sender) -- Restart
+    mist.scheduleFunction(function() -- Restart
+        if lfs and deleteSave == true and savePath ~= nil then
+            os.remove(lfs.writedir() .. "Missions/Saves/" .. savePath)
+        end
+
         trigger.action.setUserFlag(restartFlag, true)
-    end, {}, timer.getTime() + restartTime)
+    end, {}, timer.getTime() + restartTime + 15) -- Add 15s offset to avoid conflict with saving system
 end
 
 -- Server Restart Timer Function Done
@@ -29,31 +33,28 @@ restartTimer(scheduledRestartTime, scheduledRestartHintTimeList, scheduledRestar
 
 -- Scheduled Restart Done
 
--- Mission Complete Restart
+-- Mission End Restart
 
-local missionCompleteCheckScheduler = nil
+local function missionEndCondition()
+    return BattlefieldManager.noRedZones or BattlefieldManager.noBlueZones
+end
 
-local missionCompleteCheck = function(event, sender)
-    if BattlefieldManager.noRedZones or BattlefieldManager.noBlueZones then
+local missionEndScheduler = nil
+
+local function missionEnd()
+    if missionEndCondition() then
         local restartTime = 900 -- 15 minutes
         local restartHintTimeList = { 60, 180, 300, 600, 900 }
         local restartFlag = "FLAG_MISSION_RESTART"
-        local restartHint = "服务器将于 %d 分钟后清档重启！"
+        local restartHint = "任务结束！服务器将于 %d 分钟后清档重启！"
+        local savePath = "pretense_1.1.json"
 
-        restartTimer(restartTime, restartHintTimeList, restartFlag, restartHint, 90)
+        restartTimer(restartTime, restartHintTimeList, restartFlag, restartHint, 90, true, savePath)
 
-        mist.scheduleFunction(function(event, sender)
-            if lfs then
-                os.remove(lfs.writedir() .. "Missions/Saves/pretense_1.1.json")
-            end
-
-            trigger.action.setUserFlag("FLAG_MISSION_RESTART", true)
-        end, {}, timer.getTime() + restartTime + 15) -- Add 15s offset to avoid conflict with saving system
-
-        mist.removeFunction(missionCompleteCheckScheduler)
+        mist.removeFunction(missionEndScheduler)
     end
 end
 
-missionCompleteCheckScheduler = mist.scheduleFunction(missionCompleteCheck, {}, timer.getTime() + 90, 90)
+missionEndScheduler = mist.scheduleFunction(missionEnd, {}, timer.getTime() + 90, 90)
 
 -- Mission Complete Restart Done
