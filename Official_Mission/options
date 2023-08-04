@@ -48,7 +48,7 @@ options =
         ["easyCommunication"] = false,
         ["reports"] = true,
         ["heading_units"] = 1,
-        ["units"] = "metric",
+        ["units"] = "imperial",
         ["externalViews"] = true,
         ["autoTrimmer"] = false,
         ["controlsIndicator"] = false,
@@ -345,6 +345,7 @@ options =
         ["F-15ESE"] = 
         {
             ["RAND_RDR_CHANNEL"] = false,
+            ["RADAR_SAR_SCINTILLATION"] = true,
             ["RADAR_MAX_CORES"] = 4,
             ["CPLocalList"] = "default",
             ["MONITOR_EYEPOINT_OFFSET"] = 0,

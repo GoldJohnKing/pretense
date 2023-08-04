@@ -637,6 +637,12 @@ do
 					group.state = 'enroute'
 					group.lastStateTime = timer.getAbsTime()
 					MissionTargetRegistry.addBaiTarget(group)
+				elseif timer.getAbsTime() - group.lastStateTime > GroupMonitor.blockedDespawnTime then
+					env.info('GroupMonitor: processSurface ['..group.name..'] despawned due to blockage')
+					gr:destroy()
+					local todeliver = math.floor(group.product.cost)
+					z:addResource(todeliver)
+					return true
 				end
 			end
 		elseif group.state =='enroute' then
@@ -2618,6 +2624,11 @@ do
 						self:deliverHercCargo(cargo)
 					else
 						table.insert(remaining, cargo)
+					end
+				else
+					env.info('PlayerLogistics - Hercules - cargo crashed')
+					if cargo.unit and cargo.unit:isExist() then
+						trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' crashed', 10)
 					end
 				end
 			end
@@ -9340,21 +9351,25 @@ do
                 for name, unit in pairs(self.mission.players) do
                     if unit and unit:isExist() then
                         local gr = Group.getByName(self.param.target.name)
-                        local un = gr:getUnit(1)
-                        local dist = mist.utils.get3DDist(unit:getPoint(), un:getPoint())
-                        local m = 'Distance: '
-                        if dist>1000 then
-                            local dstkm = string.format('%.2f',dist/1000)
-                            local dstnm = string.format('%.2f',dist/1852)
+                        if gr and gr:getSize() > 0 then
+                            local un = gr:getUnit(1)
+                            if un then
+                                local dist = mist.utils.get3DDist(unit:getPoint(), un:getPoint())
+                                local m = 'Distance: '
+                                if dist>1000 then
+                                    local dstkm = string.format('%.2f',dist/1000)
+                                    local dstnm = string.format('%.2f',dist/1852)
 
-                            m = m..dstkm..'km | '..dstnm..'nm'
-                        else
-                            local dstft = math.floor(dist/0.3048)
-                            m = m..math.floor(dist)..'m | '..dstft..'ft'
+                                    m = m..dstkm..'km | '..dstnm..'nm'
+                                else
+                                    local dstft = math.floor(dist/0.3048)
+                                    m = m..math.floor(dist)..'m | '..dstft..'ft'
+                                end
+
+                                m = m..'\nBearing: '..math.floor(Utils.getBearing(unit:getPoint(), un:getPoint()))
+                                trigger.action.outTextForUnit(unit:getID(), m, updateFrequency)
+                            end
                         end
-
-                        m = m..'\nBearing: '..math.floor(Utils.getBearing(unit:getPoint(), un:getPoint()))
-                        trigger.action.outTextForUnit(unit:getID(), m, updateFrequency)
                     end
                 end
 
