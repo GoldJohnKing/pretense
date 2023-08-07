@@ -38,6 +38,10 @@ spencershepard (GRIMM):
  31 July 2023
  Dzsek (Dzsekeb):
  - generate fake kill event on splash damage kill, attributed to original Unit
+
+ 2 August 2023
+ Dzsek (Dzsekeb):
+ - fake the weapon object in the kill event entirely to improve compatibility with scripts
 --]]
 
 ----[[ ##### SCRIPT CONFIGURATION ##### ]]----
@@ -405,7 +409,233 @@ function modelUnitDamage(units)
     end
   end
 end
+
+FakeUnit = {}
+do
+  function FakeUnit:new(original)
+    local obj = { 
+      desc = original:getDesc(),
+      name = original:getName(),
+      pos = original:getPosition(),
+      side = original:getCoalition(),
+      country = original:getCountry(),
+      original = original,
+      playerName = original:getPlayerName(),
+      id = original:getID(),
+      number = original:getNumber(),
+      objectID = original:getObjectID(),
+      callsign = original:getCallsign()
+    }
+
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+  end
+
+  function FakeUnit:isActive()
+    return false
+  end
+
+  function FakeUnit:getPlayerName()
+    return self.playerName
+  end
+
+  function FakeUnit:getID()
+    return self.id
+  end
+
+  function FakeUnit:getNumber()
+    return self.number
+  end
+
+  function FakeUnit:getObjectID()
+    return self.objectID
+  end
+
+  function FakeUnit:getController()
+    return nil
+  end
+
+  function FakeUnit:getGroup()
+    return nil
+  end
+
+  function FakeUnit:getCallsign()
+    return self.callsign
+  end
+
+  function FakeUnit:getLife()
+    return 0
+  end
+
+  function FakeUnit:getLife0()
+    return 0
+  end
+
+  function FakeUnit:getFuel()
+    return 0
+  end
+
+  function FakeUnit:getAmmo()
+    return nil
+  end
+
+  function FakeUnit:getSensors()
+    return nil
+  end
+
+  function FakeUnit:hasSensors()
+    return false
+  end
+
+  function FakeUnit:getRadar()
+    return nil
+  end
+
+  function FakeUnit:getDrawArgumentValue()
+    return 0
+  end
+
+  function FakeUnit:getNearestCargos()
+    return nil
+  end
+
+  function FakeUnit:enableEmission()
+    return nil
+  end
+
+  function FakeUnit:getDescentCapacity()
+    return 0
+  end
  
+  function FakeUnit:getDesc()
+    return self.desc
+  end
+
+  function FakeUnit:isExist()
+    return self.original:IsExist()
+  end
+
+  function FakeUnit:destroy()
+  end
+
+  function FakeUnit:getCategory()
+    return Object.Category.UNIT
+  end
+
+  function FakeUnit:getTypeName()
+    return self.desc.typeName
+  end
+
+  function FakeUnit:hasAttribute(attr)
+    return self.desc.attributes[attr]
+  end
+
+  function FakeUnit:getName()
+    return self.name
+  end
+
+  function FakeUnit:getPoint()
+    return self.pos.p
+  end
+
+  function FakeUnit:getPosition()
+    return self.pos
+  end
+
+  function FakeUnit:getVelocity()
+    return {x=0,y=0,z=0}
+  end
+
+  function FakeUnit:inAir()
+    return false
+  end
+
+  function FakeUnit:getCoalition()
+    return self.side
+  end
+
+  function FakeUnit:getCountry()
+    return self.country
+  end
+end
+
+FakeWeapon = {}
+do
+  function FakeWeapon:new(weaponDesc)
+    local obj = { 
+      desc = weaponDesc
+    }
+
+    setmetatable(obj, self)
+    self.__index = self
+    return obj
+  end
+
+  function FakeWeapon:getDesc()
+    return self.desc
+  end
+
+  function FakeWeapon:isExist()
+    return false
+  end
+
+  function FakeWeapon:destroy()
+  end
+
+  function FakeWeapon:getCategory()
+    return Object.Category.WEAPON
+  end
+
+  function FakeWeapon:getTypeName()
+    return ""
+  end
+
+  function FakeWeapon:hasAttribute()
+    return false
+  end
+
+  function FakeWeapon:getName()
+    return ""
+  end
+
+  function FakeWeapon:getPoint()
+    return {x=0,y=0,z=0}
+  end
+
+  function FakeWeapon:getPosition()
+    return {
+      p = self:getPoint(),
+      x = 0,
+      y = 0,
+      z = 0
+    }
+  end
+
+  function FakeWeapon:getVelocity()
+    return {x=0,y=0,z=0}
+  end
+
+  function FakeWeapon:inAir()
+    return true
+  end
+
+  function FakeWeapon:getCoalition()
+    return 0
+  end
+
+  function FakeWeapon:getCountry()
+    return 0
+  end
+
+  function FakeWeapon:getLauncher()
+    return nil
+  end
+
+  function FakeWeapon:getTarget()
+    return nil
+  end
+end
  
 function blastWave(_point, _radius, weapon, power, initiator)
   local foundUnits = {}
@@ -456,7 +686,7 @@ function blastWave(_point, _radius, weapon, power, initiator)
               --debugMsg("static obj :"..obj:getTypeName())
             end
             if explosion_size > power then explosion_size = power end --secondary explosions should not be larger than the explosion that created it
-            fakedEvent.target = obj
+            fakedEvent.target = FakeUnit:new(obj)
             fakedEvent.triggerTime = timer.getTime() + timing
             if splash_damage_options.kill_events then 
               tracked_secondary_kills[obj:getName()] = fakedEvent
@@ -478,12 +708,7 @@ function blastWave(_point, _radius, weapon, power, initiator)
   local fakedEvent = {
     id = 28, 
     init = initiator, 
-    weapon = { 
-      desc = weapon,
-      getDesc = function(self)
-        return self.desc
-      end
-      }
+    weapon = FakeWeapon:new(weapon)
   }
   world.searchObjects(Object.Category.UNIT, volS, ifFound, fakedEvent)
   world.searchObjects(Object.Category.STATIC, volS, ifFound, fakedEvent)
