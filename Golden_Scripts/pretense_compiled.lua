@@ -31,6 +31,7 @@ Config.randomBoost = Config.randomBoost or 0.0004 -- adds a random factor to bui
 Config.buildSpeed = Config.buildSpeed or 10 -- structure and defense build speed
 Config.supplyBuildSpeed = Config.supplyBuildSpeed or 85 -- supply helicopters and convoys build speed
 Config.missionBuildSpeedReduction = Config.missionBuildSpeedReduction or 0.12 -- reduction of build speed in case of ai missions
+Config.maxDistFromFront = Config.maxDistFromFront or 129640 -- max distance in meters from front after which zone is forced into low activity state (export mode)
 
 Config.missions = Config.missions or {}
 
@@ -902,7 +903,7 @@ do
 							TaskExtensions.heloEngageTargets(gr, tgtToEngage, group.product.expend)
 							group.isengaging = true
 							group.startedEngaging = timer.getAbsTime()
-						elseif group.isengaging and #tgtToEngage == 0 and group.startedEngaging and (timer.getAbsTime() - group.startedEngaging) > 60 then
+						elseif group.isengaging and #tgtToEngage == 0 and group.startedEngaging and (timer.getAbsTime() - group.startedEngaging) > 60*5 then
 							env.info('GroupMonitor: processAir ['..group.name..'] resuming mission')
 							if group.returning then
 								group.returning = nil
@@ -4060,10 +4061,33 @@ do
 	function ZoneCommand:fullUpgrade(resourcePercentage)
 		if not resourcePercentage then resourcePercentage = 0.25 end
 		self.resource = math.floor(self.maxResource*resourcePercentage)
+		self:fullBuild()
+	end
+
+	function ZoneCommand:fullBuild(useCost)
 		for i,v in ipairs(self.upgrades[self.side]) do
+			if useCost then
+				local cost = v.cost * useCost
+				if self.resource >= cost then
+					self:removeResource(cost)
+				else
+					break
+				end
+			end
+
 			self:instantBuild(v)
+
 			for i2,v2 in ipairs(v.products) do
 				if (v2.type == 'defense' or v2.type=='upgrade') and v2.cost > 0 then
+					if useCost then
+						local cost = v2.cost * useCost
+						if self.resource >= cost then
+							self:removeResource(cost)
+						else
+							break
+						end
+					end
+
 					self:instantBuild(v2)
 				end
 			end
@@ -4223,7 +4247,7 @@ do
 				env.info('ZoneCommand:verifyBuildValid - stopping mission build, zone is neutral')
 			end
 
-			if self.mode == 'export' or self.mode == 'supply' then 
+			if (self.mode == 'export' and not self.keepActive) or self.mode == 'supply' then 
 				env.info('ZoneCommand:verifyBuildValid - stopping mission build, mode is '..self.mode..'')
 				self.currentMissionBuild = nil
 			end
@@ -4540,7 +4564,7 @@ do
 				end
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.cas then
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 
 			for _,tgt in pairs(ZoneCommand.getAllZones()) do
 				if self:isCasMissionValid(product, tgt) then 
@@ -4548,7 +4572,7 @@ do
 				end
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.cas_helo then
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 
 			for _,tgt in pairs(self.neighbours) do
 				if self:isCasMissionValid(product, tgt) then 
@@ -4556,7 +4580,7 @@ do
 				end
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.strike then
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 
 			for _,tgt in pairs(ZoneCommand.getAllZones()) do
 				if self:isStrikeMissionValid(product, tgt) then 
@@ -4564,7 +4588,7 @@ do
 				end
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.sead then
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 
 			for _,tgt in pairs(ZoneCommand.getAllZones()) do
 				if self:isSeadMissionValid(product, tgt) then 
@@ -4572,7 +4596,7 @@ do
 				end
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.patrol then
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 
 			for _,tgt in pairs(ZoneCommand.getAllZones()) do
 				if self:isPatrolMissionValid(product, tgt) then 
@@ -4581,7 +4605,7 @@ do
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.bai then
 			if not ZoneCommand.groupMonitor then return false end
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 
 			for _,tgt in pairs(ZoneCommand.groupMonitor.groups) do
 				if self:isBaiMissionValid(product, tgt) then 
@@ -4590,7 +4614,7 @@ do
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.awacs then
 			if not ZoneCommand.groupMonitor then return false end
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 			for _,tgt in pairs(ZoneCommand.getAllZones()) do
 				if self:isAwacsMissionValid(product, tgt) then 
 					return true
@@ -4598,7 +4622,7 @@ do
 			end
 		elseif product.missionType == ZoneCommand.missionTypes.tanker then
 			if not ZoneCommand.groupMonitor then return false end
-			if self.mode ~= ZoneCommand.modes.normal then return false end
+			if self.mode ~= ZoneCommand.modes.normal and not self.keepActive then return false end
 			if not self.distToFront or self.distToFront == 0 then return false end
 			for _,tgt in pairs(ZoneCommand.getAllZones()) do
 				if self:isTankerMissionValid(product, tgt) then 
@@ -5403,6 +5427,7 @@ do
 		--if target.side ~= product.side then return false end
 		if target.name == self.name then return false end
 		if not target.distToFront or target.distToFront > 1 then return false end
+		if target.side ~= product.side and target.side ~= 0 then return false end
 		local dist = mist.utils.get2DDist(self.zone.point, target.zone.point)
 		if dist > 150000 then return false end
 		
@@ -5847,7 +5872,8 @@ end
 
 BattlefieldManager = {}
 do
-	BattlefieldManager.distanceOverride = 27780 -- 15nm
+	BattlefieldManager.closeOverride = 27780 -- 15nm
+	BattlefieldManager.farOverride = Config.maxDistFromFront -- default 100nm
 	BattlefieldManager.boostScale = {[0] = 1.0, [1]=1.0, [2]=1.0}
 	BattlefieldManager.noRedZones = false
 	BattlefieldManager.noBlueZones = false
@@ -5895,7 +5921,7 @@ do
 				for name2,zone2 in pairs(zones) do
 					if zone.side ~= zone2.side then
 						local dist = mist.utils.get2DDist(zone.zone.point, zone2.zone.point)
-						if not zone.closestEnemy or dist < zone.closestEnemyDist then
+						if not zone.closestEnemyDist or dist < zone.closestEnemyDist then
 							zone.closestEnemyDist = dist
 						end
 					end
@@ -5935,9 +5961,19 @@ do
 			
 			for name, zone in pairs(zones) do
 				if zone.keepActive then
-					zone.mode = ZoneCommand.modes.normal
+					if zone.closestEnemyDist and zone.closestEnemyDist > BattlefieldManager.farOverride and zone.distToFront > 3 then
+						zone.mode = ZoneCommand.modes.export
+					else
+						if zone.mode ~= ZoneCommand.modes.normal then
+							zone:fullBuild(1.0)
+						end
+						zone.mode = ZoneCommand.modes.normal
+					end
 				else
-					if not zone.distToFront or zone.distToFront == 0 or (zone.closestEnemyDist and zone.closestEnemyDist < BattlefieldManager.distanceOverride) then
+					if not zone.distToFront or zone.distToFront == 0 or (zone.closestEnemyDist and zone.closestEnemyDist < BattlefieldManager.closeOverride) then
+						if zone.mode ~= ZoneCommand.modes.normal then
+							zone:fullBuild(1.0)
+						end
 						zone.mode = ZoneCommand.modes.normal
 					elseif zone.distToFront == 1 then
 						zone.mode = ZoneCommand.modes.supply
@@ -7731,7 +7767,7 @@ do
         if CommandFunctions.jtac then
             CommandFunctions.jtac:deployAtZone(zone)
             CommandFunctions.jtac:showMenu()
-            CommandFunctions.jtac:setLifeTime(30)
+            CommandFunctions.jtac:setLifeTime(60)
         end
     end
 
@@ -8942,7 +8978,7 @@ do
         end
 
         msg = msg..'\n Protect players: '
-        for i,v in ipairs(self.param.mis.players) do
+        for i,v in pairs(self.param.mis.players) do
             msg = msg..'\n  '..i
         end
         
@@ -13304,6 +13340,7 @@ do
                 if i.side and i.side ~= 0 then
                     z:capture(i.side, true)
                     z:fullUpgrade()
+                    z:boostProduction(math.random(1,200))
                 end
             end
         end
