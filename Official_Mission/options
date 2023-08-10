@@ -256,7 +256,7 @@ options =
             ["Ka50TrimmingMethod"] = 0,
             ["Ka50RudderTrimmer"] = false,
             ["hmdEye"] = 1,
-            ["CPLocalList"] = "default",
+            ["CPLocalList"] = "english",
             ["helmetCircleDisplacement"] = 11,
         }, -- end of ["Ka-50"]
         ["F-15C"] = 
@@ -470,7 +470,7 @@ options =
             ["Ka50RudderTrimmer"] = false,
             ["hmdEye"] = 1,
             ["Ka50PedalsYawReqReset"] = false,
-            ["CPLocalList"] = "default",
+            ["CPLocalList"] = "english",
             ["helmetCircleDisplacement"] = 11,
         }, -- end of ["Ka-50_3"]
         ["F-15ESE"] = 
