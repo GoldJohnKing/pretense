@@ -8,7 +8,7 @@ local script_list =
     "pretense_compiled.lua",
     "init.lua",
     "restart_timer.lua",
-    "Splash_Damage_2_0.lua",
+    -- "Splash_Damage_2_0.lua",
 }
 
 local function load_scripts(path, list)
