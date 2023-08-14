@@ -1,0 +1,11 @@
+mapResource = {}
+mapResource["ResKey_Action_12"] = "endscreen.jpg"
+mapResource["mist"] = "mist_4_5_107_custom.lua"
+mapResource["ResKey_Action_13"] = "endsong.ogg"
+mapResource["init"] = "init.lua"
+mapResource["main"] = "pretense_compiled.lua"
+mapResource["ResKey_Action_16"] = "endsong2.ogg"
+mapResource["ResKey_ImageBriefing_17"] = "cover_syria_modern_small.jpg"
+mapResource["ResKey_Action_15"] = "endscreen2.jpg"
+mapResource["ResKey_Action_10"] = "success.ogg"
+mapResource["ResKey_Action_9"] = "fail.ogg"
