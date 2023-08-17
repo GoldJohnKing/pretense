@@ -18,7 +18,7 @@ local function load_scripts(path, list)
 end
 
 if lfs then
-    script_path = lfs.writedir() .. "Missions/Scripts/Pretense/"
+    script_path = lfs.writedir() .. "Missions/Scripts/Pretense_SyriaCW/"
 
     env.info("Pretense - LFS available, using relative script load path: " .. script_path)
 else
