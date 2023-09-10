@@ -4064,6 +4064,8 @@ do
 	end
 
 	function ZoneCommand:fullBuild(useCost)
+		if self.side ~= 1 and self.side ~= 2 then return end -- Edited, temporarily fix a crash issue by Dzsekeb
+
 		for i,v in ipairs(self.upgrades[self.side]) do
 			if useCost then
 				local cost = v.cost * useCost
