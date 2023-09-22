@@ -7,7 +7,7 @@ options =
         ["TrackIR_external_views"] = false,
         ["f11_free_camera"] = true,
         ["f10_awacs"] = true,
-        ["Coordinate_Display"] = "Metric",
+        ["Coordinate_Display"] = "MGRS",
         ["accidental_failures"] = false,
         ["Datum"] = 1,
         ["show_pilot_body"] = false,
@@ -280,7 +280,7 @@ options =
             ["Ka50TrimmingMethod"] = 0,
             ["Ka50RudderTrimmer"] = false,
             ["hmdEye"] = 1,
-            ["CPLocalList"] = "default",
+            ["CPLocalList"] = "english",
             ["helmetCircleDisplacement"] = 11,
         }, -- end of ["Ka-50"]
         ["F-15C"] = 
@@ -348,6 +348,7 @@ options =
             ["RADAR_SAR_SCINTILLATION"] = true,
             ["RADAR_MAX_CORES"] = 4,
             ["CPLocalList"] = "default",
+            ["RADALT_ADVANCED"] = false,
             ["MONITOR_EYEPOINT_OFFSET"] = 0,
             ["THROTTLE_CO_DETENT"] = 3,
             ["FF_TRIM_OFFSET"] = false,
@@ -372,13 +373,19 @@ options =
         }, -- end of ["Hercules"]
         ["AV8BNA"] = 
         {
-            ["INS_Alignment"] = 2,
+            ["MPCD_GAIN"] = 40,
+            ["USE_REAL_TDC"] = false,
             ["INS_GYROHasNAV"] = false,
+            ["MPCD_CONS"] = 70,
             ["USE_MPCD_EXPORT"] = false,
             ["CPLocalList"] = "default",
-            ["USE_REAL_TDC"] = false,
+            ["INS_Alignment"] = 2,
             ["MPCD_EXPORT"] = false,
         }, -- end of ["AV8BNA"]
+        ["Su-25"] = 
+        {
+            ["CPLocalList"] = "default",
+        }, -- end of ["Su-25"]
         ["UH-60L"] = 
         {
             ["aimingMarkRemove"] = false,
@@ -460,17 +467,6 @@ options =
             ["trimSpeedRoll"] = 100,
             ["customRollPressure"] = 50,
         }, -- end of ["A-4E-C"]
-        ["CA"] = 
-        {
-            ["kompass_options"] = 2,
-            ["ground_aim_helper"] = true,
-            ["ground_platform_shake"] = true,
-            ["ground_target_info"] = true,
-            ["ground_isometric"] = true,
-            ["ground_engine_autostart"] = true,
-            ["ground_automatic"] = true,
-            ["automatic_clutch"] = true,
-        }, -- end of ["CA"]
         ["Mi-24P"] = 
         {
             ["CPLocalList"] = "english",
@@ -492,15 +488,36 @@ options =
             ["Mi24PedalsAutoMove"] = true,
             ["weapTooltipsMi24"] = false,
         }, -- end of ["Mi-24P"]
+        ["CA"] = 
+        {
+            ["kompass_options"] = 2,
+            ["ground_aim_helper"] = true,
+            ["ground_platform_shake"] = true,
+            ["ground_target_info"] = true,
+            ["ground_isometric"] = true,
+            ["ground_engine_autostart"] = true,
+            ["ground_automatic"] = true,
+            ["automatic_clutch"] = true,
+        }, -- end of ["CA"]
         ["Ka-50_3"] = 
         {
             ["Ka50TrimmingMethod"] = 0,
             ["Ka50RudderTrimmer"] = false,
             ["hmdEye"] = 1,
             ["Ka50PedalsYawReqReset"] = false,
-            ["CPLocalList"] = "default",
+            ["CPLocalList"] = "english",
             ["helmetCircleDisplacement"] = 11,
         }, -- end of ["Ka-50_3"]
+        ["TF-51D"] = 
+        {
+            ["assistance"] = 100,
+            ["CPLocalList"] = "default",
+            ["autoRudder"] = false,
+        }, -- end of ["TF-51D"]
+        ["AJS37"] = 
+        {
+            ["CPLocalList"] = "Imperial stickers",
+        }, -- end of ["AJS37"]
         ["DCS-SRS"] = 
         {
             ["srsOverlayHelpTextEnabled"] = false,
@@ -508,16 +525,6 @@ options =
             ["srsAutoLaunchEnabled"] = false,
             ["srsOverlayCompactModeEnabled"] = false,
         }, -- end of ["DCS-SRS"]
-        ["AJS37"] = 
-        {
-            ["CPLocalList"] = "Imperial stickers",
-        }, -- end of ["AJS37"]
-        ["TF-51D"] = 
-        {
-            ["assistance"] = 100,
-            ["CPLocalList"] = "default",
-            ["autoRudder"] = false,
-        }, -- end of ["TF-51D"]
         ["A-10C"] = 
         {
             ["CPLocalList"] = "default",
