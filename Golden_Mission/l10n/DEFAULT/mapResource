@@ -1,11 +1,11 @@
-mapResource = 
-{
-    ["ResKey_ImageBriefing_17"] = "cover_syria_modern_small.jpg",
-    ["ResKey_Action_9"] = "fail.ogg",
-    ["ResKey_Action_13"] = "endsong.ogg",
-    ["init"] = "Load_Scripts.lua",
-    ["ResKey_Action_10"] = "success.ogg",
-    ["ResKey_Action_16"] = "endsong2.ogg",
-    ["ResKey_Action_12"] = "endscreen.jpg",
-    ["ResKey_Action_15"] = "endscreen2.jpg",
-} -- end of mapResource
+mapResource = {}
+mapResource["ResKey_Action_10"] = "success.ogg"
+mapResource["ResKey_ImageBriefing_17"] = "cover_syria_modern_small.jpg"
+mapResource["main"] = "pretense_compiled.lua"
+mapResource["ResKey_Action_12"] = "endscreen.jpg"
+mapResource["ResKey_Action_15"] = "endscreen2.jpg"
+mapResource["ResKey_Action_9"] = "fail.ogg"
+mapResource["ResKey_Action_16"] = "endsong2.ogg"
+mapResource["mist"] = "mist_4_5_107_custom.lua"
+mapResource["ResKey_Action_13"] = "endsong.ogg"
+mapResource["init"] = "init.lua"
