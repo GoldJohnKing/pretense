@@ -2542,7 +2542,7 @@ do
 									unit = event.initiator
 								})
 								
-								env.info('PlayerLogistics - Hercules - '..unitName..'deployed crate with '..amount..' supplies')
+								env.info('PlayerLogistics - Hercules - '..unitName..' deployed crate with '..amount..' supplies')
 								self.context:processHercCargos(unitName)
 								self.context.hercPreparedDrops[groupId] = nil
 								trigger.action.outTextForUnit(event.initiator:getID(), 'Crate with '..amount..' supplies deployed', 10)
@@ -2577,7 +2577,7 @@ do
 									unit = event.initiator
 								})
 								
-								env.info('PlayerLogistics - Hercules - '..unitName..'deployed crate with '..toDrop.type)
+								env.info('PlayerLogistics - Hercules - '..unitName..' deployed crate with '..toDrop.type)
 								self.context:processHercCargos(unitName)
 								self.context.hercPreparedDrops[groupId] = nil
 								
@@ -2607,6 +2607,7 @@ do
 				local reschedule = params.context:checkHercCargo(params.unitName, time)
 				if not reschedule then
 					params.context.hercTracker.cargoCheckFunctions[params.unitName] = nil
+					env.info('PlayerLogistics - Hercules - stopped tracking cargos of '..unitName)
 				end
 				
 				return reschedule
@@ -2627,9 +2628,14 @@ do
 						table.insert(remaining, cargo)
 					end
 				else
-					env.info('PlayerLogistics - Hercules - cargo crashed')
+					env.info('PlayerLogistics - Hercules - cargo crashed '..tostring(cargo.supply)..' '..tostring(cargo.squad))
+					if cargo.squad then 
+						env.info('PlayerLogistics - Hercules - squad crashed '..tostring(cargo.squad.type))
+					end
+
 					if cargo.unit and cargo.unit:isExist() then
-						trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' crashed', 10)
+						local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
+						trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
 					end
 				end
 			end
@@ -2647,13 +2653,14 @@ do
 				local zone = ZoneCommand.getZoneOfWeapon(cargo.object)
 				if zone then
 					zone:addResource(cargo.supply)
-					cargo.object:destroy()
 					env.info('PlayerLogistics - Hercules - '..cargo.supply..' delivered to '..zone.name)
 
 					self:awardSupplyXP(cargo.lastLoaded, zone, cargo.unit, cargo.supply)
 				end
 			elseif cargo.squad then
 				local pos = Utils.getPointOnSurface(cargo.object:getPoint())
+				pos.y = pos.z
+				pos.z = nil
 				local surface = land.getSurfaceType(pos)
 				if surface == land.SurfaceType.LAND or surface == land.SurfaceType.ROAD or surface == land.SurfaceType.RUNWAY then
 					local zn = ZoneCommand.getZoneOfPoint(pos)
@@ -2672,13 +2679,12 @@ do
 					else
 						local error = self.squadTracker:spawnInfantry(self.registeredSquadGroups[cargo.squad.type], pos)
 						if not error then
-							cargo.object:destroy()
 							env.info('PlayerLogistics - Hercules - '..cargo.squad.type..' deployed')
 							
 							local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
-							trigger.action.outTextForUnit(cargo.unit:getID(), squadName..' deployed', 10)
 							
 							if cargo.unit and cargo.unit:isExist() and cargo.unit.getPlayerName then
+								trigger.action.outTextForUnit(cargo.unit:getID(), squadName..' deployed', 10)
 								local player = cargo.unit:getPlayerName()
 								local xp = RewardDefinitions.actions.squadDeploy
 								
@@ -2693,8 +2699,17 @@ do
 							end
 						end
 					end
+				else
+					env.info('PlayerLogistics - Hercules - '..cargo.squad.type..' dropped on invalid surface '..tostring(surface))
+					local cpos = cargo.object:getPoint()
+					env.info('PlayerLogistics - Hercules - cargo spot X:'..cpos.x..' Y:'..cpos.y..' Z:'..cpos.z)
+					env.info('PlayerLogistics - Hercules - surface spot X:'..pos.x..' Y:'..pos.y..' Z:'..pos.z)
+					local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
+					trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
 				end
 			end
+
+			cargo.object:destroy()
 		end
 	end
 
@@ -3989,6 +4004,22 @@ do
 		end
 
 		self:refreshText()
+
+		if self.airbaseName then
+			local ab = Airbase.getByName(self.airbaseName)
+			if ab then
+				if ab:autoCaptureIsOn() then ab:autoCapture(false) end
+				ab:setCoalition(self.side)
+			else
+				for i=1,10,1 do
+					local ab = Airbase.getByName(self.airbaseName..'-'..i)
+					if ab then
+						if ab:autoCaptureIsOn() then ab:autoCapture(false) end
+						ab:setCoalition(self.side)
+					end
+				end
+			end
+		end
 	end
 	
 	function ZoneCommand:addResource(amount)
@@ -4064,7 +4095,7 @@ do
 	end
 
 	function ZoneCommand:fullBuild(useCost)
-		if self.side ~= 1 and self.side ~= 2 then return end -- Edited, temporarily fix a crash issue by Dzsekeb
+		if self.side ~= 1 and self.side ~= 2 then return end
 
 		for i,v in ipairs(self.upgrades[self.side]) do
 			if useCost then
@@ -12639,7 +12670,7 @@ do
 
     function SquadTracker:restoreInfantry(save)
 
-        Spawner.createObject(save.name, save.data.name, save.position, 2, 10, 20,{
+        Spawner.createObject(save.name, save.data.name, save.position, 2, 20, 30,{
             [land.SurfaceType.LAND] = true, 
             [land.SurfaceType.ROAD] = true,
             [land.SurfaceType.RUNWAY] = true,
@@ -12663,7 +12694,7 @@ do
     function SquadTracker:spawnInfantry(infantryData, position)
         local callsign = self:generateCallsign()
         if callsign then
-            Spawner.createObject(callsign, infantryData.name, position, 2, 10, 20,{
+            Spawner.createObject(callsign, infantryData.name, position, 2, 20, 30,{
                 [land.SurfaceType.LAND] = true, 
                 [land.SurfaceType.ROAD] = true,
                 [land.SurfaceType.RUNWAY] = true,
@@ -12831,7 +12862,7 @@ do
                     local p = Utils.getPointOnSurface(unPos)
                     p.x = p.x + math.random(-5,5)
                     p.z = p.z + math.random(-5,5)
-		            trigger.action.smoke(p, trigger.smokeColor.Green)
+		            trigger.action.smoke(p, trigger.smokeColor.Blue)
                     squad.lastMarkerDeployedTime = timer.getAbsTime()
                 end
             end
