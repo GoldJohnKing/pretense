@@ -247,10 +247,34 @@ options =
             ["ACHS1_System_Time"] = false,
             ["RP5_Ground_Return"] = 0,
         }, -- end of ["MiG-19P"]
-        ["A-10C"] = 
+        ["CaptoGlove"] = 
         {
-            ["CPLocalList"] = "default",
-        }, -- end of ["A-10C"]
+            ["shoulderJointZ_Right"] = 23,
+            ["armBending"] = 60,
+            ["shoulderJointX_Right"] = -15,
+            ["mouseClickSrc"] = 0,
+            ["shoulderJointZ_Left"] = 23,
+            ["shoulderJointX_Left"] = -15,
+            ["set_debug"] = false,
+            ["pitchOffsetGlove_Left"] = 0,
+            ["yawOffsetGlove_Left"] = 0,
+            ["yawOffsetShoulder_Right"] = 0,
+            ["useBending"] = false,
+            ["shoulderLength_Right"] = 40,
+            ["pitchOffsetGlove_Right"] = 0,
+            ["shoulderJointY_Left"] = -23,
+            ["forearmLength_Left"] = 30,
+            ["shoulderLength_Left"] = 40,
+            ["set_attach"] = false,
+            ["pitchOffsetShoulder_Right"] = 0,
+            ["forearmLength_Right"] = 30,
+            ["pitchOffsetShoulder_Left"] = 0,
+            ["set_symmetrically"] = false,
+            ["yawOffsetShoulder_Left"] = 0,
+            ["enable"] = false,
+            ["shoulderJointY_Right"] = -23,
+            ["yawOffsetGlove_Right"] = 0,
+        }, -- end of ["CaptoGlove"]
         ["Ka-50"] = 
         {
             ["Ka50TrimmingMethod"] = 0,
@@ -318,13 +342,22 @@ options =
             ["ControlsDisplayLocation"] = 0,
             ["PedalTrimType"] = 1,
         }, -- end of ["SA342"]
-        ["DCS-SRS"] = 
+        ["F-15ESE"] = 
         {
-            ["srsOverlayHelpTextEnabled"] = false,
-            ["srsOverlayEnabled"] = false,
-            ["srsAutoLaunchEnabled"] = false,
-            ["srsOverlayCompactModeEnabled"] = false,
-        }, -- end of ["DCS-SRS"]
+            ["RAND_RDR_CHANNEL"] = false,
+            ["RADAR_SAR_SCINTILLATION"] = true,
+            ["RADAR_MAX_CORES"] = 4,
+            ["CPLocalList"] = "default",
+            ["RADALT_ADVANCED"] = false,
+            ["MONITOR_EYEPOINT_OFFSET"] = 0,
+            ["THROTTLE_CO_DETENT"] = 3,
+            ["FF_TRIM_OFFSET"] = false,
+            ["THROTTLE_AB_DETENT"] = 74,
+            ["VR_EYEPOINT_OFFSET"] = 5,
+            ["FF_PITCH_GAIN"] = 65,
+            ["FF_ROLL_GAIN"] = 65,
+            ["GHOST_CONTROLS"] = false,
+        }, -- end of ["F-15ESE"]
         ["F/A-18C"] = 
         {
             ["abDetent"] = 0,
@@ -340,11 +373,13 @@ options =
         }, -- end of ["Hercules"]
         ["AV8BNA"] = 
         {
-            ["INS_Alignment"] = 2,
+            ["MPCD_GAIN"] = 40,
+            ["USE_REAL_TDC"] = false,
             ["INS_GYROHasNAV"] = false,
+            ["MPCD_CONS"] = 70,
             ["USE_MPCD_EXPORT"] = false,
             ["CPLocalList"] = "default",
-            ["USE_REAL_TDC"] = false,
+            ["INS_Alignment"] = 2,
             ["MPCD_EXPORT"] = false,
         }, -- end of ["AV8BNA"]
         ["Su-25"] = 
@@ -473,60 +508,27 @@ options =
             ["CPLocalList"] = "english",
             ["helmetCircleDisplacement"] = 11,
         }, -- end of ["Ka-50_3"]
-        ["F-15ESE"] = 
-        {
-            ["RAND_RDR_CHANNEL"] = false,
-            ["RADAR_SAR_SCINTILLATION"] = true,
-            ["RADAR_MAX_CORES"] = 4,
-            ["CPLocalList"] = "default",
-            ["RADALT_ADVANCED"] = false,
-            ["MONITOR_EYEPOINT_OFFSET"] = 0,
-            ["THROTTLE_CO_DETENT"] = 3,
-            ["FF_TRIM_OFFSET"] = false,
-            ["THROTTLE_AB_DETENT"] = 74,
-            ["VR_EYEPOINT_OFFSET"] = 5,
-            ["FF_PITCH_GAIN"] = 65,
-            ["FF_ROLL_GAIN"] = 65,
-            ["GHOST_CONTROLS"] = false,
-        }, -- end of ["F-15ESE"]
-        ["AJS37"] = 
-        {
-            ["CPLocalList"] = "Imperial stickers",
-        }, -- end of ["AJS37"]
         ["TF-51D"] = 
         {
             ["assistance"] = 100,
             ["CPLocalList"] = "default",
             ["autoRudder"] = false,
         }, -- end of ["TF-51D"]
-        ["CaptoGlove"] = 
+        ["AJS37"] = 
         {
-            ["shoulderJointZ_Right"] = 23,
-            ["armBending"] = 60,
-            ["shoulderJointX_Right"] = -15,
-            ["mouseClickSrc"] = 0,
-            ["shoulderJointZ_Left"] = 23,
-            ["shoulderJointX_Left"] = -15,
-            ["set_debug"] = false,
-            ["pitchOffsetGlove_Left"] = 0,
-            ["yawOffsetGlove_Left"] = 0,
-            ["yawOffsetShoulder_Right"] = 0,
-            ["useBending"] = false,
-            ["shoulderLength_Right"] = 40,
-            ["pitchOffsetGlove_Right"] = 0,
-            ["shoulderJointY_Left"] = -23,
-            ["forearmLength_Left"] = 30,
-            ["shoulderLength_Left"] = 40,
-            ["set_attach"] = false,
-            ["pitchOffsetShoulder_Right"] = 0,
-            ["forearmLength_Right"] = 30,
-            ["pitchOffsetShoulder_Left"] = 0,
-            ["set_symmetrically"] = false,
-            ["yawOffsetShoulder_Left"] = 0,
-            ["enable"] = false,
-            ["shoulderJointY_Right"] = -23,
-            ["yawOffsetGlove_Right"] = 0,
-        }, -- end of ["CaptoGlove"]
+            ["CPLocalList"] = "Imperial stickers",
+        }, -- end of ["AJS37"]
+        ["DCS-SRS"] = 
+        {
+            ["srsOverlayHelpTextEnabled"] = false,
+            ["srsOverlayEnabled"] = false,
+            ["srsAutoLaunchEnabled"] = false,
+            ["srsOverlayCompactModeEnabled"] = false,
+        }, -- end of ["DCS-SRS"]
+        ["A-10C"] = 
+        {
+            ["CPLocalList"] = "default",
+        }, -- end of ["A-10C"]
         ["F-16C"] = 
         {
             ["abDetent"] = 0,
