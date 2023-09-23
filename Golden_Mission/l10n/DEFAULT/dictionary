@@ -10,7 +10,8 @@ Complete tasks from the mission board, to gain experience and rise through the r
     ["DictKey_descriptionNeutralsTask_4"] = "",
     ["DictKey_sortie_5"] = "",
     ["DictKey_descriptionRedTask_2"] = "",
-    ["DictKey_ActionText_19"] = "",
     ["DictKey_ActionText_28"] = "return false",
+    ["DictKey_ActionText_19"] = "",
     ["DictKey_ActionText_38"] = "return BattlefieldManager.noRedZones",
+    ["DictKey_ActionText_42"] = "",
 } -- end of dictionary
