@@ -47,7 +47,7 @@ local function missionEnd()
         local restartHintTimeList = { 60, 180, 300, 600, 900 }
         local restartFlag = "FLAG_MISSION_RESTART"
         local restartHint = "任务结束！服务器将于 %d 分钟后清档重启！"
-        local savePath = "pretense_1.1.json"
+        local savePath = "pretense_syria_1.0.json"
 
         restartTimer(restartTime, restartHintTimeList, restartFlag, restartHint, 90, true, savePath)
 
