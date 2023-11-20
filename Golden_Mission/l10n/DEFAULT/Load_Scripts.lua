@@ -3,7 +3,7 @@ local script_path = "D:/GitRepos/pretense/Golden_Scripts/"
 local script_list =
 {
     -- Load order must be correct
-    "mist_4_5_107_custom.lua",
+    "mist.lua",
     "config_override.lua",
     "pretense_compiled.lua",
     "init.lua",
