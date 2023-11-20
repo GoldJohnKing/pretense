@@ -2634,8 +2634,12 @@ do
 					end
 
 					if cargo.unit and cargo.unit:isExist() then
-						local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
-						trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
+						if cargo.squad then 
+							local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
+							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
+						else
+							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' crashed', 10)
+						end
 					end
 				end
 			end
