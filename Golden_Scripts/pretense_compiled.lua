@@ -709,7 +709,7 @@ do
 								for _,tgt in ipairs(targets) do
 									if tgt.visible and tgt.object then
 										if tgt.object.getCoalition and tgt.object:getCoalition()~=frUnit:getCoalition() and 
-											tgt.object.getCategory and Object.getCategory(tgt.object) == Object.Category.UNIT then
+											tgt.object.getCategory and Object.getCategory(tgt.object) == Object.Category.UNIT then -- Edited, fix for new getCategory behaviour since DCS version 2.9.1.48111(16.11.2023)
 											local dist = mist.utils.get3DDist(frUnit:getPoint(), tgt.object:getPoint())
 											if dist < 1000 then
 												if not group.isstopped then
@@ -885,7 +885,7 @@ do
 						if #targets > 0 then
 							for _,tgt in ipairs(targets) do
 								if tgt.visible and tgt.object and tgt.object.isExist and tgt.object:isExist() then
-									if tgt.object.getCategory and Object.getCategory(tgt.object) == Object.Category.UNIT and 
+									if tgt.object.getCategory and Object.getCategory(tgt.object) == Object.Category.UNIT and -- Edited, fix for new getCategory behaviour since DCS version 2.9.1.48111(16.11.2023)
 										tgt.object.getCoalition and tgt.object:getCoalition()~=frUnit:getCoalition() and 
 										tgt.object:getDesc().category == Unit.Category.GROUND_UNIT then
 
@@ -6277,7 +6277,7 @@ do
             if not player then return end
             
             if event.id==world.event.S_EVENT_PLAYER_ENTER_UNIT then
-                if event.initiator and Object.getCategory(event.initiator) == Object.Category.UNIT and 
+                if event.initiator and Object.getCategory(event.initiator) == Object.Category.UNIT and -- Edited, fix for new getCategory behaviour since DCS version 2.9.1.48111(16.11.2023)
                     (event.initiator:getDesc().category == Unit.Category.AIRPLANE or event.initiator:getDesc().category == Unit.Category.HELICOPTER)  then
                     
                         local pname = event.initiator:getPlayerName()
@@ -13192,7 +13192,7 @@ do
                         local detected = u:getController():getDetectedTargets(Controller.Detection.RADAR)
                         for _,d in ipairs(detected) do
                             if d and d.object and d.object.isExist and d.object:isExist() and 
-                                Object.getCategory(d.object) == Object.Category.UNIT and
+                                Object.getCategory(d.object) == Object.Category.UNIT and -- Edited, fix for new getCategory behaviour since DCS version 2.9.1.48111(16.11.2023)
                                 d.object.getCoalition and
                                 d.object:getCoalition() == self.tgtSide then
                                     
