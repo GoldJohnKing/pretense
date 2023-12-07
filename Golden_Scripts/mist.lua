@@ -894,7 +894,6 @@ do -- the main scope
 					if Object.isExist(val.object) then
 						pos = Object.getPosition(val.object)
 					end
-
 					if pos then
 						local static_found = false
 						for ind, static in pairs(mist.DBs.unitsByCat.static) do
@@ -1562,7 +1561,6 @@ do -- the main scope
 					if Object.isExist(val.object) then
 						pos = Object.getPosition(val.object)
 					end
-					
 					if pos then
 						local static_found = false
 						for ind, static in pairs(mist.DBs.unitsByCat.static) do
@@ -1933,7 +1931,7 @@ do -- the main scope
 		if not newGroup.hidden then
 			newGroup.hidden = false
 		end
-		
+
 		if not newGroup.hiddenOnMFD then
 			newGroup.hiddenOnMFD = false
 		end
@@ -4359,13 +4357,13 @@ do -- group functions scope
 			action = 'tele'
 			newGroupData = vars.groupData
 		end
-
+        
 		if vars.heading then
 			for unitNum, unitData in pairs(newGroupData.units) do
 				newGroupData.units[unitNum].heading = vars.heading
 			end
 		end
-        
+
         if vars.newGroupName then
             newGroupData.groupName = vars.newGroupName
         end
