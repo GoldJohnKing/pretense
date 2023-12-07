@@ -22,6 +22,55 @@ But here it is. Enjoy.
 
 If, after you get the chance to play it a bit, you consider I deserve it, feel free to buy me a [beer](https://www.buymeacoffee.com/dzsek). 
 
+## Contents
+
+1. [The Battlefield](#1-the-battlefield)
+    1. [Zones](#11-zones)
+    2. [Resources](#12-resources)
+    3. [Production](#13-production)
+    4. [Zone labels](#14-zone-labels)
+    5. [AI Mission types](#15-ai-mission-types)
+    6. [Player Spawns](#16-player-spawns)
+    7. [Capturing a zone](#17-capturing-a-zone)
+2. [Logistics](#2-logistics)
+    1. [Supplies](#21-supplies)
+    2. [Infantry](#22-infantry)
+    3. [CSAR](#23-csar-combat-search-and-rescue)
+    4. [Compatible aircraft](#24-compatible-aircraft)
+    5. [Hercules mod airdrop support](#25-hercules-mod-airdrop-support)
+3. [Missions](#3-missions)
+    1. [The mission board](#31-the-mission-board)
+    2. [Accepting, joining and leaving a mission](#32-accepting-joining-and-leaving-a-mission)
+    3. [Starting and completing a mission](#33-starting-and-completing-a-mission)
+    4. [Failed missions](#34-failed-missions)
+    5. [Mission Types](#35-mission-types)
+4. [Finding information while playing](#4-finding-information-while-playing)
+    1. [Kneeboard](#41-kneeboard)
+    2. [Radio Channels](#42-radio-channels)
+    3. [Player information](#43-player-information)
+    4. [GCI menu](#44-gci-menu)
+5. [Player XP, Ranks, and Command tokens](#5-player-xp-ranks-and-command-tokens)
+6. [Editing the mission to suit your needs](#6-editing-the-mission-to-suit-your-needs)
+    1. [Config](#61-config)
+    2. [Randomized start](#62-randomized-start)
+7. [Persistence](#7-persistence)
+    1. [Persistence for mission time and weather randomization](#71-persistence-for-mission-time-and-weather-randomization)
+8. [Running the mission on a server](#8-running-the-mission-on-a-server)
+    1. [Slotblock](#81-slotblock)
+    2. [Stats file](#82-stats-file)
+9. [Issue reporting](#9-issue-reporting)
+    1. [Knows issues with 3rd party scripts](#91-knows-issues-with-3rd-party-scripts)
+10. [FAQ](#10-faq)
+    1. [Is it compatible with IADS, CTLD, etc. scripts?](#101-is-it-compatible-with-iads-ctld-etc-scripts)
+    2. [I've added the hercules mod, but airdropped units just disapear](#102-ive-added-the-hercules-mod-but-airdropped-units-just-disapear)
+    3. [I've added CTLD/Hercules script, but deployed units are not saved after the mission is restarted.](#103-ive-added-ctldhercules-script-but-deployed-units-are-not-saved-after-the-mission-is-restarted)
+    4. [It's too difficult/too easy](#104-its-too-difficulttoo-easy)
+    5. [I've conquered all zones up to the mountains but now gameplay has slowed down significantly, and flight times across the mountains are too long.](#105-ive-conquered-all-zones-up-to-the-mountains-but-now-gameplay-has-slowed-down-significantly-and-flight-times-across-the-mountains-are-too-long)
+    6. [Can I play this in singleplayer?](#106-can-i-play-this-in-singleplayer)
+    7. [FC3 aircraft are cold start even in the hot start version of the mission](#107-fc3-aircraft-are-cold-start-even-in-the-hot-start-version-of-the-mission)
+    8. [Will you do a version for *[insert map]* ?](#108-will-you-do-a-version-for-insert-map)
+11. [Changelog](#11-changelog)
+
 ## 1. The Battlefield
 
 These are some general rules on how the mission functions.
@@ -756,3 +805,30 @@ If I will, I wont tell you about it unless it's close to release.
 - Fixed crash on trying to restore a zone from culling but zone is neutral
 - F-14B player spawns now have INS fast align enabled
 - Added missing JTAC option
+
+### Caucasus V1.3.7 - 1 Dec 2023
+
+- Fixed issues introduced from scripting API changes (getCategory())
+- Updated mist to latest version
+
+### Syria Cold War V1.0.5 - 1 Dec 2023
+
+- Fixed issues introduced from scripting API changes (getCategory())
+- Updated mist to latest version
+
+### Syria V1.0.2 - 1 Dec 2023
+
+- Fixed issues introduced from scripting API changes (getCategory())
+- Updated mist to latest version
+
+### Caucasus V1.3.8 - 3 Dec 2023
+
+- Fixed issue where ground assault convoys were stopping to engage already destroyed enemies
+
+### Syria Cold War V1.0.6 - 3 Dec 2023
+
+- Fixed issue where ground assault convoys were stopping to engage already destroyed enemies
+
+### Syria V1.0.3 - 3 Dec 2023
+
+- Fixed issue where ground assault convoys were stopping to engage already destroyed enemies
