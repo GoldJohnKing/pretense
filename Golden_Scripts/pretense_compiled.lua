@@ -4244,6 +4244,7 @@ do
 			color = {0,0,1,0.3}
 		end
 		
+		trigger.action.setMarkupFontSize(self.index, 12) -- Edited, override default font size
 		trigger.action.setMarkupColorFill(self.index, color)
 		trigger.action.setMarkupColor(self.index, color)
 		trigger.action.setMarkupTypeLine(self.index, 1)
@@ -6333,7 +6334,7 @@ do
 		end, {context = self}, timer.getTime()+10)
 
 		timer.scheduleFunction(function(param, time)
-			local x = math.random(-50,50) -- the lower limit benefits blue, higher limit benefits red, adjust to increase limit of random boost variance, default (-50,50)
+			local x = math.random(-25,75) -- the lower limit benefits blue, higher limit benefits red, adjust to increase limit of random boost variance, default (-50,50) -- Edited, benefit red more, default = -50,50
 			local boostIntensity = Config.randomBoost -- adjusts the intensity of the random boost variance, default value = 0.0004
 			local factor = (x*x*x*boostIntensity)/100  -- the farther x is the higher the factor, negative beneifts blue, pozitive benefits red
 			param.context.boostScale[1] = 1.0+factor
@@ -6365,7 +6366,7 @@ do
 			param.context.boostScale[2] = param.context.boostScale[2] + bluep
 
 			--limit to numbers above 0
-			param.context.boostScale[1] = math.max(0.01,param.context.boostScale[1])
+			param.context.boostScale[1] = math.max(0.5,param.context.boostScale[1]) -- Edited, limit red side minimun boostScale to 0.5, default = 0.01
 			param.context.boostScale[2] = math.max(0.01,param.context.boostScale[2])
 
 			env.info('BattlefieldManager - power red = '..param.context.boostScale[1])
@@ -12157,7 +12158,7 @@ do
         end
     end
 
-    MissionTracker.missionBoardSize = 10
+    MissionTracker.missionBoardSize = 12 -- Edited, increase overall max mission count, default = 10
 
 	function MissionTracker:new()
 		local obj = {}
