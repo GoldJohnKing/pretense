@@ -5,3 +5,4 @@ Config.buildSpeed = 15 -- structure and defense build speed
 Config.supplyBuildSpeed = 150 -- supply helicopters and convoys build speed
 Config.missionBuildSpeedReduction = 0.125 -- reduction of build speed in case of ai missions
 Config.maxDistFromFront = 80 * 1852 -- max distance in meters from front after which zone is forced into low activity state (export mode)
+Config.restrictMissionAcceptance = true -- if set to true, missions can only be accepted while landed inside friendly zones
