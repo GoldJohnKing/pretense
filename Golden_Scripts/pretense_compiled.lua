@@ -2877,7 +2877,7 @@ do
 					end
 
 					if cargo.unit and cargo.unit:isExist() then
-						if cargo.squad then 
+						if cargo.squad then -- Edited, temporary fix for C-130 cargo drop crash
 							local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
 							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
 						else
