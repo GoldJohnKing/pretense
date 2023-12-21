@@ -53,7 +53,8 @@ Config.buildSpeed = Config.buildSpeed or 10 -- structure and defense build speed
 Config.supplyBuildSpeed = Config.supplyBuildSpeed or 85 -- supply helicopters and convoys build speed
 Config.missionBuildSpeedReduction = Config.missionBuildSpeedReduction or 0.12 -- reduction of build speed in case of ai missions
 Config.maxDistFromFront = Config.maxDistFromFront or 129640 -- max distance in meters from front after which zone is forced into low activity state (export mode)
-Config.restrictMissionAcceptance = true -- if set to true, missions can only be accepted while landed inside friendly zones
+
+if Config.restrictMissionAcceptance == nil then Config.restrictMissionAcceptance = true end -- if set to true, missions can only be accepted while landed inside friendly zones
 
 Config.missions = Config.missions or {}
 
@@ -2877,8 +2878,12 @@ do
 					end
 
 					if cargo.unit and cargo.unit:isExist() then
-						local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
-						trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
+						if cargo.squad then
+							local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
+							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
+						elseif cargo.supply then
+							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..cargo.supply..' supplies crashed', 10)
+						end
 					end
 				end
 			end
@@ -3746,9 +3751,11 @@ do
 				if un:getDesc().typeName == "Hercules" then
 					local loadedInCrates = 0
 					local ammo = un:getAmmo()
-					for _,load in ipairs(ammo) do
-						if load.desc.typeName == 'weapons.bombs.Generic Crate [20000lb]' then
-							loadedInCrates = 9000 * load.count
+					if ammo then 
+						for _,load in ipairs(ammo) do
+							if load.desc.typeName == 'weapons.bombs.Generic Crate [20000lb]' then
+								loadedInCrates = 9000 * load.count
+							end
 						end
 					end
 
