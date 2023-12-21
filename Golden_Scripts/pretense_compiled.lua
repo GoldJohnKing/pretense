@@ -1032,7 +1032,7 @@ do
 								if tgt.visible and tgt.object and tgt.object.isExist and tgt.object:isExist() then
 									if Object.getCategory(tgt.object) == Object.Category.UNIT and 
 										tgt.object.getCoalition and tgt.object:getCoalition()~=frUnit:getCoalition() and 
-										Unit.getCategory(tgt.object) == Unit.Category.GROUND_UNIT then
+										Unit.getCategoryEx(tgt.object) == Unit.Category.GROUND_UNIT then
 
 										local dist = mist.utils.get3DDist(frUnit:getPoint(), tgt.object:getPoint())
 										if dist < 2000 then
@@ -6482,7 +6482,7 @@ do
             
             if event.id==world.event.S_EVENT_PLAYER_ENTER_UNIT then
                 if event.initiator and Object.getCategory(event.initiator) == Object.Category.UNIT and 
-                    (Unit.getCategory(event.initiator) == Unit.Category.AIRPLANE or Unit.getCategory(event.initiator) == Unit.Category.HELICOPTER)  then
+                    (Unit.getCategoryEx(event.initiator) == Unit.Category.AIRPLANE or Unit.getCategoryEx(event.initiator) == Unit.Category.HELICOPTER)  then
                     
                         local pname = event.initiator:getPlayerName()
                         if pname then
