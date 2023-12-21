@@ -22,6 +22,55 @@ But here it is. Enjoy.
 
 If, after you get the chance to play it a bit, you consider I deserve it, feel free to buy me a [beer](https://www.buymeacoffee.com/dzsek). 
 
+## Contents
+
+1. [The Battlefield](#1-the-battlefield)
+    1. [Zones](#11-zones)
+    2. [Resources](#12-resources)
+    3. [Production](#13-production)
+    4. [Zone labels](#14-zone-labels)
+    5. [AI Mission types](#15-ai-mission-types)
+    6. [Player Spawns](#16-player-spawns)
+    7. [Capturing a zone](#17-capturing-a-zone)
+2. [Logistics](#2-logistics)
+    1. [Supplies](#21-supplies)
+    2. [Infantry](#22-infantry)
+    3. [CSAR](#23-csar-combat-search-and-rescue)
+    4. [Compatible aircraft](#24-compatible-aircraft)
+    5. [Hercules mod airdrop support](#25-hercules-mod-airdrop-support)
+3. [Missions](#3-missions)
+    1. [The mission board](#31-the-mission-board)
+    2. [Accepting, joining and leaving a mission](#32-accepting-joining-and-leaving-a-mission)
+    3. [Starting and completing a mission](#33-starting-and-completing-a-mission)
+    4. [Failed missions](#34-failed-missions)
+    5. [Mission Types](#35-mission-types)
+4. [Finding information while playing](#4-finding-information-while-playing)
+    1. [Kneeboard](#41-kneeboard)
+    2. [Radio Channels](#42-radio-channels)
+    3. [Player information](#43-player-information)
+    4. [GCI menu](#44-gci-menu)
+5. [Player XP, Ranks, and Command tokens](#5-player-xp-ranks-and-command-tokens)
+6. [Editing the mission to suit your needs](#6-editing-the-mission-to-suit-your-needs)
+    1. [Config](#61-config)
+    2. [Randomized start](#62-randomized-start)
+7. [Persistence](#7-persistence)
+    1. [Persistence for mission time and weather randomization](#71-persistence-for-mission-time-and-weather-randomization)
+8. [Running the mission on a server](#8-running-the-mission-on-a-server)
+    1. [Slotblock](#81-slotblock)
+    2. [Stats file](#82-stats-file)
+9. [Issue reporting](#9-issue-reporting)
+    1. [Knows issues with 3rd party scripts](#91-knows-issues-with-3rd-party-scripts)
+10. [FAQ](#10-faq)
+    1. [Is it compatible with IADS, CTLD, etc. scripts?](#101-is-it-compatible-with-iads-ctld-etc-scripts)
+    2. [I've added the hercules mod, but airdropped units just disapear](#102-ive-added-the-hercules-mod-but-airdropped-units-just-disapear)
+    3. [I've added CTLD/Hercules script, but deployed units are not saved after the mission is restarted.](#103-ive-added-ctldhercules-script-but-deployed-units-are-not-saved-after-the-mission-is-restarted)
+    4. [It's too difficult/too easy](#104-its-too-difficulttoo-easy)
+    5. [I've conquered all zones up to the mountains but now gameplay has slowed down significantly, and flight times across the mountains are too long.](#105-ive-conquered-all-zones-up-to-the-mountains-but-now-gameplay-has-slowed-down-significantly-and-flight-times-across-the-mountains-are-too-long)
+    6. [Can I play this in singleplayer?](#106-can-i-play-this-in-singleplayer)
+    7. [FC3 aircraft are cold start even in the hot start version of the mission](#107-fc3-aircraft-are-cold-start-even-in-the-hot-start-version-of-the-mission)
+    8. [Will you do a version for *[insert map]* ?](#108-will-you-do-a-version-for-insert-map)
+11. [Changelog](#11-changelog)
+
 ## 1. The Battlefield
 
 These are some general rules on how the mission functions.
@@ -364,6 +413,8 @@ The GCI menu lets you set a warning radius around you, in which you will recieve
 To activate reports you have to choose a warning radius from the `Other->GCI->Set Warning Radius` option in the radio menu.
 You can disable reports using the `Other->GCI->Disable` option.
 
+The selected option will persist through aircraft changes, respawns and mission/server restarts.
+
 > Note: This is not an all-seeing eye of Sauron. You will only recieve reports of aircraft that were detected by search radars, early warning radars, and AWACS on your side.
 
 ## 5. Player XP, Ranks, and Command tokens
@@ -384,6 +435,8 @@ Available CMD items:
 |Priority Zone|The selected zone will become a priority for your coalition. All AI missions will first target this zone if possible, and choose an alternative target if the selected one is not viable. You can use this to prioritize attacks on an enemy zone, captures on a neutral zone, and resupplys on a friendly zone. Lasts about 1 hour |
 |Hack comms|Has a chance to reveal resources and production information of zones near the frontline(success rate 50%)|
 |Bribe officer|Has a chance to reveal resources and production on almost all enemy zones. (success rate 50%)|
+
+The amount of XP earned can be increased by staying in the same aircraft for longer periods of time. After 10 minutes of flight time, an XP multiplier will start growing slowly from 1.0x up to 5.0x. The current value of the multiplier can be seen in the player information menu. This survival bonus is applied at the time the XP is earned. Switching to a different aircraft, or respawning for any reason will reset the multiplier.
 
 ## 6. Editing the mission to suit your needs
 
@@ -421,6 +474,7 @@ Config.buildSpeed = 10 -- structure and defense build speed (smaller number long
 Config.supplyBuildSpeed = 85 -- supply helicopters and convoys build speed (smaller number longer build times)
 Config.missionBuildSpeedReduction = 0.12 -- reduction of build speed in case of ai missions (smaller number longer build times)
 Config.maxDistFromFront = Config.maxDistFromFront or 129640 -- max distance in meters from front after which zone is forced into low activity state (export mode)
+Config.restrictMissionAcceptance = true -- if set to true, missions can only be accepted while landed inside friendly zones
 ```
 
 You can paste this in a do script action that is run **before** the mission scripts. You can leave out the values you do not wish to change.
@@ -756,3 +810,132 @@ If I will, I wont tell you about it unless it's close to release.
 - Fixed crash on trying to restore a zone from culling but zone is neutral
 - F-14B player spawns now have INS fast align enabled
 - Added missing JTAC option
+
+### Caucasus V1.3.7 - 1 Dec 2023
+
+- Fixed issues introduced from scripting API changes (getCategory())
+- Updated mist to latest version
+
+### Syria Cold War V1.0.5 - 1 Dec 2023
+
+- Fixed issues introduced from scripting API changes (getCategory())
+- Updated mist to latest version
+
+### Syria V1.0.2 - 1 Dec 2023
+
+- Fixed issues introduced from scripting API changes (getCategory())
+- Updated mist to latest version
+
+### Caucasus V1.3.8 - 3 Dec 2023
+
+- Fixed issue where ground assault convoys were stopping to engage already destroyed enemies
+
+### Syria Cold War V1.0.6 - 3 Dec 2023
+
+- Fixed issue where ground assault convoys were stopping to engage already destroyed enemies
+
+### Syria V1.0.3 - 3 Dec 2023
+
+- Fixed issue where ground assault convoys were stopping to engage already destroyed enemies
+
+### Caucasus V1.4.0 - 15 Dec 2023
+
+- Added xp multiplier bonus for surviving longer times in the same aircraft
+- Ground assault convoys now attempt repositioning if they stopped to engage the enemy but have been waiting for a long time
+- Fixed TARCAP mission not failing on some occasions when it should have
+- Added manual landing validation option to radio menu (For cases when the game fails to detect a landing)
+- Added config option to disable having to be landed and inside friendly zone to accept missions
+- Added persistent player configuration radio menu
+- Players can now enable a warning from the radio menu, that shows up while they are landed and have no active mission
+- Added logic to attempt getting ground convoys unstuck
+- GCI settings are now persistent between respawns, aircraft changes and mission/server restarts
+- Added EPLRS task to AWACS
+
+### Syria Cold War V1.1.0 - 15 Dec 2023
+
+- Added xp multiplier bonus for surviving longer times in the same aircraft
+- Ground assault convoys now attempt repositioning if they stopped to engage the enemy but have been waiting for a long time
+- Fixed TARCAP mission not failing on some occasions when it should have
+- Added manual landing validation option to radio menu (For cases when the game fails to detect a landing)
+- Added config option to disable having to be landed and inside friendly zone to accept missions
+- Added persistent player configuration radio menu
+- Players can now enable a warning from the radio menu, that shows up while they are landed and have no active mission
+- Added logic to attempt getting ground convoys unstuck
+- GCI settings are now persistent between respawns, aircraft changes and mission/server restarts
+- Replaced BMP-2 with BMP-1 units
+- Downgraded some of the AA weapons of the AI
+
+### Syria V1.1.0 - 15 Dec 2023
+
+- Added xp multiplier bonus for surviving longer times in the same aircraft
+- Ground assault convoys now attempt repositioning if they stopped to engage the enemy but have been waiting for a long time
+- Fixed TARCAP mission not failing on some occasions when it should have
+- Added manual landing validation option to radio menu (For cases when the game fails to detect a landing)
+- Added config option to disable having to be landed and inside friendly zone to accept missions
+- Added persistent player configuration radio menu
+- Players can now enable a warning from the radio menu, that shows up while they are landed and have no active mission
+- Added logic to attempt getting ground convoys unstuck
+- GCI settings are now persistent between respawns, aircraft changes and mission/server restarts
+- Added EPLRS task to AWACS
+
+### Caucasus V1.4.1 - 17 Dec 2023
+
+- Fixed crash on AWACS tasking 
+
+### Syria Cold War V1.1.1 - 17 Dec 2023
+
+- Fixed crash on AWACS tasking (not relevant as no AWACS in cold war, main script change only)
+
+### Syria V1.1.1 - 17 Dec 2023
+
+- Fixed crash on AWACS tasking
+
+### Caucasus V1.4.2 - 18 Dec 2023
+
+- Fixed AWACS datalink
+
+### Syria Cold War V1.1.2 - 18 Dec 2023
+
+- Fixed AWACS datalink (not relevant as no AWACS in cold war, main script change only)
+
+### Syria V1.1.2 - 18 Dec 2023
+
+- Fixed AWACS datalink
+
+### Caucasus V1.4.3 - 19 Dec 2023
+
+- Added FCR to Apache spawns
+- Save now resets if any of the coalitions does not own a single zone at mission load
+- Join code now shows in mission details in air if mission accept restrictions are disabled
+
+### Syria Cold War V1.1.3 - 19 Dec 2023
+
+- Save now resets if any of the coalitions does not own a single zone at mission load
+- Join code now shows in mission details in air if mission accept restrictions are disabled
+
+### Syria V1.1.3 - 19 Dec 2023
+
+- Added FCR to Apache spawns
+- Save now resets if any of the coalitions does not own a single zone at mission load
+- Join code now shows in mission details in air if mission accept restrictions are disabled
+
+### Caucasus V1.4.4 - 20 Dec 2023
+
+- Fixed Config.restrictMissionAcceptance being overriden when set to false according to instructions
+- Fixed error when loading supplies into C130 mod without having crates on board
+- Fixed error when droping supply crate over invalid terrain
+- Fixed mission file serializer format to be similar to EDs (should fix some compatibility issues with 3rd party tools)
+
+### Syria Cold War V1.1.4 - 20 Dec 2023
+
+- Fixed Config.restrictMissionAcceptance being overriden when set to false according to instructions
+- Fixed error when loading supplies into C130 mod without having crates on board
+- Fixed error when droping supply crate over invalid terrain
+- Fixed mission file serializer format to be similar to EDs (should fix some compatibility issues with 3rd party tools)
+
+### Syria V1.1.4 - 20 Dec 2023
+
+- Fixed Config.restrictMissionAcceptance being overriden when set to false according to instructions
+- Fixed error when loading supplies into C130 mod without having crates on board
+- Fixed error when droping supply crate over invalid terrain
+- Fixed mission file serializer format to be similar to EDs (should fix some compatibility issues with 3rd party tools)
