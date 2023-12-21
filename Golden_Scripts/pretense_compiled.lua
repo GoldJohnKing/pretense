@@ -53,7 +53,8 @@ Config.buildSpeed = Config.buildSpeed or 10 -- structure and defense build speed
 Config.supplyBuildSpeed = Config.supplyBuildSpeed or 85 -- supply helicopters and convoys build speed
 Config.missionBuildSpeedReduction = Config.missionBuildSpeedReduction or 0.12 -- reduction of build speed in case of ai missions
 Config.maxDistFromFront = Config.maxDistFromFront or 129640 -- max distance in meters from front after which zone is forced into low activity state (export mode)
-Config.restrictMissionAcceptance = true -- if set to true, missions can only be accepted while landed inside friendly zones
+
+if Config.restrictMissionAcceptance == nil then Config.restrictMissionAcceptance = true end -- if set to true, missions can only be accepted while landed inside friendly zones
 
 Config.missions = Config.missions or {}
 
@@ -789,8 +790,8 @@ do
 													end
 													shouldstop = true
 													break
+												end
 											end
-										end
 										end
 									end
 								end
@@ -2877,11 +2878,11 @@ do
 					end
 
 					if cargo.unit and cargo.unit:isExist() then
-						if cargo.squad then -- Edited, temporary fix for C-130 cargo drop crash
+						if cargo.squad then
 							local squadName = PlayerLogistics.getInfantryName(cargo.squad.type)
 							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..squadName..' crashed', 10)
-						else
-							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' crashed', 10)
+						elseif cargo.supply then
+							trigger.action.outTextForUnit(cargo.unit:getID(), 'Cargo drop of '..cargo.unit:getPlayerName()..' with '..cargo.supply..' supplies crashed', 10)
 						end
 					end
 				end
@@ -3750,9 +3751,11 @@ do
 				if un:getDesc().typeName == "Hercules" then
 					local loadedInCrates = 0
 					local ammo = un:getAmmo()
-					for _,load in ipairs(ammo) do
-						if load.desc.typeName == 'weapons.bombs.Generic Crate [20000lb]' then
-							loadedInCrates = 9000 * load.count
+					if ammo then 
+						for _,load in ipairs(ammo) do
+							if load.desc.typeName == 'weapons.bombs.Generic Crate [20000lb]' then
+								loadedInCrates = 9000 * load.count
+							end
 						end
 					end
 
@@ -5828,15 +5831,15 @@ do
 							for _,a in ipairs(attributes) do
 								if unit:hasAttribute(a) then
 									if amount==nil then
-									return true
-								else
-									count = count + 1
-									if count >= amount then return true end
+										return true
+									else
+										count = count + 1
+										if count >= amount then return true end
+									end
 								end
 							end
 						end
 					end
-				end
 				end
 			end
 		end
@@ -6621,10 +6624,10 @@ do
             timer.scheduleFunction(function(param, time)
                 local un = param.unit
                 if not un or not un:isExist() then return end
-                        
-                        local player = param.player
-                        local isLanded = Utils.isLanded(un, true)
-                        local zn = ZoneCommand.getZoneOfUnit(un:getName())
+                
+                local player = param.player
+                local isLanded = Utils.isLanded(un, true)
+                local zn = ZoneCommand.getZoneOfUnit(un:getName())
 
                 env.info('PlayerTracker - '..player..' checking if landed: '..tostring(isLanded))
 
@@ -6642,11 +6645,11 @@ do
                                     trigger.action.outTextForUnit(un:getID(), key..' +'..value..'', 5)
                                 end
                             end
-                                end
-                            end
+                        end
+                    end
 
-                            local aircraft = param.context.playerAircraft[player]
-                            if aircraft and aircraft.unitID == un:getID() then
+                    local aircraft = param.context.playerAircraft[player]
+                    if aircraft and aircraft.unitID == un:getID() then
                         param.context.playerAircraft[player] = nil
                     end
                 end
@@ -12809,9 +12812,9 @@ do
             if not unit or not unit:isExist() or not Utils.isLanded(unit, true) then 
                 if unit and unit:isExist() then trigger.action.outTextForUnit(unit:getID(), 'Can only accept mission while landed', 5) end
                 return false 
-        end
+            end
 
-        local zn = ZoneCommand.getZoneOfUnit(unit:getName())
+            local zn = ZoneCommand.getZoneOfUnit(unit:getName())
             if not zn or zn.side ~= unit:getCoalition() then 
                 trigger.action.outTextForUnit(unit:getID(), 'Can only accept mission while inside friendly zone', 5)
                 return false 
@@ -12861,9 +12864,9 @@ do
             if not unit or not unit:isExist() or not Utils.isLanded(unit, true) then 
                 if unit and unit:isExist() then trigger.action.outTextForUnit(unit:getID(), 'Can only join mission while landed', 5) end
                 return false
-        end
+            end
 
-        local zn = ZoneCommand.getZoneOfUnit(unit:getName())
+            local zn = ZoneCommand.getZoneOfUnit(unit:getName())
             if not zn or zn.side ~= unit:getCoalition() then 
                 trigger.action.outTextForUnit(unit:getID(), 'Can only join mission while inside friendly zone', 5)
                 return false

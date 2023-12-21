@@ -3243,7 +3243,7 @@ zones.sochi:defineUpgrades({
 -----------------[[ MissionSpecific/PretenseCaucasus/ZoneDefinitions/Juliett.lua ]]-----------------
 
 zones.juliett = ZoneCommand:new("Juliett")
-zones.initialState = nil
+zones.juliett.initialState = nil
 zones.juliett:defineUpgrades({
     [1] = {
         presets.upgrades.basic.tent:extend({
