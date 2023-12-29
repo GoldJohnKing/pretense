@@ -6429,10 +6429,10 @@ do
 
     PlayerTracker.cmdShopPrices = {
         [PlayerTracker.cmdShopTypes.smoke] = 1,
-        [PlayerTracker.cmdShopTypes.prio] = 2,
-        [PlayerTracker.cmdShopTypes.jtac] = 3,
+        [PlayerTracker.cmdShopTypes.prio] = 1,
+        [PlayerTracker.cmdShopTypes.jtac] = 2,
         [PlayerTracker.cmdShopTypes.bribe1] = 1,
-        [PlayerTracker.cmdShopTypes.bribe2] = 3,
+        [PlayerTracker.cmdShopTypes.bribe2] = 2,
     }
 
 	function PlayerTracker:new()
@@ -6444,7 +6444,6 @@ do
         obj.groupShopMenus = {}
         obj.groupConfigMenus = {}
         obj.groupTgtMenus = {}
-        obj.playerAircraft = {}
         obj.playerEarningMultiplier = {}
 
         if lfs then 
@@ -6503,8 +6502,6 @@ do
 
                 -- reset temp track for player
                 self.context.tempStats[player] = nil
-                -- reset playeraircraft
-                self.context.playerAircraft[player] = nil
 
                 self.context.playerEarningMultiplier[player] = { spawnTime = timer.getAbsTime(), unit = event.initiator, multiplier = 1.0, minutes = 0 }
 
@@ -6562,22 +6559,7 @@ do
 
             if event.id==world.event.S_EVENT_TAKEOFF then
                 local un = event.initiator
-                local zn = ZoneCommand.getZoneOfUnit(event.initiator:getName())
                 env.info('PlayerTracker - '..player..' took off in '..tostring(un:getID())..' '..un:getName())
-                if un and zn and zn.side == un:getCoalition() then
-                    timer.scheduleFunction(function(param, time)
-                        local un = param.unit
-                        if not un or not un:isExist() then return end
-                        local player = param.player
-                        local inAir = Utils.isInAir(un)
-                        env.info('PlayerTracker - '..player..' checking if in air: '..tostring(inAir))
-                        if inAir and param.context.playerAircraft[player] == nil then
-                            if param.context.playerAircraft[player] == nil then
-                                param.context.playerAircraft[player] = { unitID = un:getID() }
-                            end
-                        end
-                    end, {player = player, unit = event.initiator, context = self.context}, timer.getTime()+10)
-                end
 			end
 
             if event.id==world.event.S_EVENT_LAND then
@@ -6592,8 +6574,7 @@ do
         timer.scheduleFunction(function(params, time)
             local players = params.context.playerEarningMultiplier
             for i,v in pairs(players) do
-                local aircraft = params.context.playerAircraft[i]
-                if aircraft and v.unit.isExist and v.unit:isExist() and aircraft.unitID == v.unit:getID() then
+                if v.unit.isExist and v.unit:isExist() then
                     if v.multiplier < 5.0 and v.unit and v.unit:isExist() and Utils.isInAir(v.unit) then
                         v.minutes = v.minutes + 1
 
@@ -6616,9 +6597,8 @@ do
     function PlayerTracker:validateLanding(unit, player)
         local un = unit
         local zn = ZoneCommand.getZoneOfUnit(unit:getName())
-        local aircraft = self.playerAircraft[player]
         env.info('PlayerTracker - '..player..' landed in '..tostring(un:getID())..' '..un:getName())
-        if aircraft and un and zn and zn.side == un:getCoalition() then
+        if un and zn and zn.side == un:getCoalition() then
             trigger.action.outTextForUnit(unit:getID(), "Wait 10 seconds to validate landing...", 10)
             timer.scheduleFunction(function(param, time)
                 local un = param.unit
@@ -6645,11 +6625,6 @@ do
                                 end
                             end
                         end
-                    end
-
-                    local aircraft = param.context.playerAircraft[player]
-                    if aircraft and aircraft.unitID == un:getID() then
-                        param.context.playerAircraft[player] = nil
                     end
                 end
             end, {player = player, unit = unit, context = self}, timer.getTime()+10)
@@ -6780,9 +6755,9 @@ do
                     local rank = context:getPlayerRank(player)
                     if not rank then return end
 
+                    local groupid = event.initiator:getGroup():getID()
+                    local groupname = event.initiator:getGroup():getName()
                     if rank.cmdChance > 0 then
-                        local groupid = event.initiator:getGroup():getID()
-                        local groupname = event.initiator:getGroup():getName()
                         
                         if context.groupShopMenus[groupid] then
                             missionCommands.removeItemForGroup(groupid, context.groupShopMenus[groupid])
@@ -6808,21 +6783,21 @@ do
 
                             context.groupShopMenus[groupid] = menu
                         end
+                    end
 
-                        if context.groupConfigMenus[groupid] then
-                            missionCommands.removeItemForGroup(groupid, context.groupConfigMenus[groupid])
-                            context.groupConfigMenus[groupid] = nil
-                        end
+                    if context.groupConfigMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupConfigMenus[groupid])
+                        context.groupConfigMenus[groupid] = nil
+                    end
 
-                        if not context.groupConfigMenus[groupid] then
-                            
-                            local menu = missionCommands.addSubMenuForGroup(groupid, 'Config')
-                            local missionWarningMenu = missionCommands.addSubMenuForGroup(groupid, 'No mission warning', menu)
-                            missionCommands.addCommandForGroup(groupid, 'Activate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, true)
-                            missionCommands.addCommandForGroup(groupid, 'Deactivate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, false)
-                  
-                            context.groupConfigMenus[groupid] = menu
-                        end
+                    if not context.groupConfigMenus[groupid] then
+                        
+                        local menu = missionCommands.addSubMenuForGroup(groupid, 'Config')
+                        local missionWarningMenu = missionCommands.addSubMenuForGroup(groupid, 'No mission warning', menu)
+                        missionCommands.addCommandForGroup(groupid, 'Activate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, true)
+                        missionCommands.addCommandForGroup(groupid, 'Deactivate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, false)
+              
+                        context.groupConfigMenus[groupid] = menu
                     end
 				end
 			elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
@@ -7111,19 +7086,19 @@ do
     PlayerTracker.ranks[4] =  { rank=4,  name='E-4 Senior airman',          requiredXP = 7700,     cmdChance = 0,       cmdAward=0}
     PlayerTracker.ranks[5] =  { rank=5,  name='E-5 Staff sergeant',         requiredXP = 11800,    cmdChance = 0,       cmdAward=0}
     PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01,    cmdAward=1}
-    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.02,    cmdAward=1}
-    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.03,    cmdAward=1}
-    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.05,    cmdAward=1}
-    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.08,    cmdAward=2}
-    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.10,    cmdAward=2}
-    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.14,    cmdAward=2}
-    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.17,    cmdAward=2}
-    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.22,    cmdAward=3}
-    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.26,    cmdAward=3}
-    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.32,    cmdAward=3}
-    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.37,    cmdAward=4}
-    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.43,    cmdAward=4}
-    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 0.50,    cmdAward=5}
+    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.03,    cmdAward=1}
+    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.06,    cmdAward=1}
+    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.10,    cmdAward=1}
+    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.14,    cmdAward=2}
+    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.20,    cmdAward=2}
+    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.27,    cmdAward=2}
+    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.34,    cmdAward=2}
+    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.43,    cmdAward=3}
+    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.52,    cmdAward=3}
+    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.63,    cmdAward=3}
+    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.74,    cmdAward=4}
+    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.87,    cmdAward=4}
+    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 1.00,    cmdAward=5}
 
     function PlayerTracker:getPlayerRank(playername)
         if self.stats[playername] then
@@ -9708,7 +9683,10 @@ do
         
         if not self.param.loadedBy then
             
-            if self.param.target.pilot:isExist() then
+            if self.param.target.pilot:isExist() and 
+                self.param.target.pilot:getSize() > 0 and 
+                self.param.target.pilot:getUnit(1):isExist() then
+                    
                 local point = self.param.target.pilot:getUnit(1):getPoint()
 
                 local lat,lon,alt = coord.LOtoLL(point)
