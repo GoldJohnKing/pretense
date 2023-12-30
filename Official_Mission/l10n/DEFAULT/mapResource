@@ -1,13 +1,13 @@
 mapResource = 
 {
-    ['ResKey_Action_13']="endsong.ogg",
-    ['ResKey_ImageBriefing_17']="cover_syria_modern_small.jpg",
-    ['ResKey_Action_10']="success.ogg",
-    ['main']="pretense_compiled.lua",
-    ['ResKey_Action_16']="endsong2.ogg",
     ['ResKey_Action_9']="fail.ogg",
+    ['ResKey_ImageBriefing_17']="cover_syria_modern_small.jpg",
     ['mist']="mist_4_5_121_custom.lua",
-    ['ResKey_Action_12']="endscreen.jpg",
-    ['ResKey_Action_15']="endscreen2.jpg",
+    ['ResKey_Action_13']="endsong.ogg",
     ['init']="init.lua",
+    ['main']="pretense_compiled.lua",
+    ['ResKey_Action_15']="endscreen2.jpg",
+    ['ResKey_Action_12']="endscreen.jpg",
+    ['ResKey_Action_10']="success.ogg",
+    ['ResKey_Action_16']="endsong2.ogg",
 } -- end of ["mapResource"]

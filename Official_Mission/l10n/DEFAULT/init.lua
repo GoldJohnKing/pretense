@@ -162,7 +162,7 @@ do
 		skill = "Excellent",
 		dataCategory= TemplateDB.type.group
 	}
-
+	
 	TemplateDB.templates["sa6"] = {
 		units = {
 			"Kub 1S91 str",
@@ -170,9 +170,9 @@ do
 			"Kub 2P25 ln",
 			"Kub 2P25 ln",
 			"Kub 2P25 ln",
-			"2S6 Tunguska",
+			"ZSU-23-4 Shilka",
 			"Ural-4320T",
-			"2S6 Tunguska",
+			"ZSU-23-4 Shilka",
 			"Kub 2P25 ln"
 		},
 		maxDist = 300,
@@ -227,7 +227,7 @@ do
 			"SA-11 Buk LN 9A310M1",
 			"SA-11 Buk LN 9A310M1",
 			"SA-11 Buk LN 9A310M1",
-			"2S6 Tunguska",
+			"ZSU-23-4 Shilka",
 			"SA-11 Buk SR 9S18M1",
 			"GAZ-66",
 			"GAZ-66",
@@ -242,7 +242,7 @@ do
 		units = {
 			"NASAMS_Command_Post",
 			"NASAMS_Radar_MPQ64F1",
-			"Vulcan",
+			"HEMTT_C-RAM_Phalanx",
 			"M 818",
 			"M 818",
 			"Roland ADS",
@@ -306,7 +306,7 @@ do
 			"M48 Chaparral",
 			"M48 Chaparral",
 			"M 818",
-			"Gepard"
+			"HEMTT_C-RAM_Phalanx"
 		},
 		maxDist = 300,
 		skill = "Excellent",
@@ -331,8 +331,8 @@ do
 			"Roland ADS",
 			"Roland ADS",
 			"M 818",
-			"Gepard",
-			"Gepard"
+			"HEMTT_C-RAM_Phalanx",
+			"HEMTT_C-RAM_Phalanx"
 		},
 		maxDist = 300,
 		skill = "Excellent",
@@ -355,8 +355,8 @@ do
 		units = {
 			"Strela-10M3",
 			"Ural-4320T",
-			"2S6 Tunguska",
-			"2S6 Tunguska"
+			"ZSU-23-4 Shilka",
+			"ZSU-23-4 Shilka"
 		},
 		maxDist = 300,
 		skill = "Excellent",

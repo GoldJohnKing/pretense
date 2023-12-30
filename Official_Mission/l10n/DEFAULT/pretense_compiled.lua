@@ -6416,7 +6416,8 @@ do
     PlayerTracker.savefile = 'player_stats.json'
     PlayerTracker.statTypes = {
         xp = 'XP',
-        cmd = "CMD"
+        cmd = "CMD",
+        survivalBonus = "SB"
     }
 
     PlayerTracker.cmdShopTypes = {
@@ -6425,6 +6426,8 @@ do
         jtac = 'jtac',
         bribe1 = 'bribe1',
         bribe2 = 'bribe2',
+        artillery = 'artillery',
+        sabotage1 = 'sabotage1',
     }
 
     PlayerTracker.cmdShopPrices = {
@@ -6433,6 +6436,8 @@ do
         [PlayerTracker.cmdShopTypes.jtac] = 2,
         [PlayerTracker.cmdShopTypes.bribe1] = 1,
         [PlayerTracker.cmdShopTypes.bribe2] = 2,
+        [PlayerTracker.cmdShopTypes.artillery] = 2,
+        [PlayerTracker.cmdShopTypes.sabotage1] = 3,
     }
 
 	function PlayerTracker:new()
@@ -6503,7 +6508,14 @@ do
                 -- reset temp track for player
                 self.context.tempStats[player] = nil
 
-                self.context.playerEarningMultiplier[player] = { spawnTime = timer.getAbsTime(), unit = event.initiator, multiplier = 1.0, minutes = 0 }
+                local minutes = 0
+                local multiplier = 1.0
+                if self.context.stats[player][PlayerTracker.statTypes.survivalBonus] ~= nil then
+                    minutes = self.context.stats[player][PlayerTracker.statTypes.survivalBonus]
+                    multiplier = PlayerTracker.minutesToMultiplier(minutes)
+                end
+
+                self.context.playerEarningMultiplier[player] = { spawnTime = timer.getAbsTime(), unit = event.initiator, multiplier = multiplier, minutes = minutes }
 
                 local config = self.context:getPlayerConfig(player)
                 if config.gci_warning_radius then
@@ -6560,6 +6572,20 @@ do
             if event.id==world.event.S_EVENT_TAKEOFF then
                 local un = event.initiator
                 env.info('PlayerTracker - '..player..' took off in '..tostring(un:getID())..' '..un:getName())
+                self.context.stats[player][PlayerTracker.statTypes.survivalBonus] = nil
+                trigger.action.outTextForUnit(un:getID(), 'Taken off, survival bonus no longer secure.', 10)
+			end
+
+            if event.id==world.event.S_EVENT_ENGINE_SHUTDOWN then
+                local un = event.initiator
+                local zn = ZoneCommand.getZoneOfUnit(un:getName())
+                if un and un:isExist() and zn and zn.side == un:getCoalition() then
+                    env.info('PlayerTracker - '..player..' has shut down engine of '..tostring(un:getID())..' '..un:getName()..' at '..zn.name)
+                    self.context.stats[player][PlayerTracker.statTypes.survivalBonus] = self.context:getPlayerMinutes(player)
+                    self.context:save()
+                    trigger.action.outTextForUnit(un:getID(), 'Engines shut down. Survival bonus secured.', 10)
+                    env.info('PlayerTracker - '..player..' secured survival bonus of '..self.context.stats[player][PlayerTracker.statTypes.survivalBonus]..' minutes')
+                end
 			end
 
             if event.id==world.event.S_EVENT_LAND then
@@ -6577,15 +6603,7 @@ do
                 if v.unit.isExist and v.unit:isExist() then
                     if v.multiplier < 5.0 and v.unit and v.unit:isExist() and Utils.isInAir(v.unit) then
                         v.minutes = v.minutes + 1
-
-                        local multi = 1.0
-                        if v.minutes > 10 and v.minutes <= 60 then
-                            multi = 1.0 + ((v.minutes-10)*0.05)
-                        elseif v.minutes > 60 then
-                            multi = 1.0 + (50*0.05) + ((v.minutes - 60)*0.025)
-                        end
-
-                        v.multiplier = math.min(multi, 5.0)
+                        v.multiplier = PlayerTracker.minutesToMultiplier(v.minutes)
                     end
                 end
             end
@@ -6624,6 +6642,8 @@ do
                                     trigger.action.outTextForUnit(un:getID(), key..' +'..value..'', 5)
                                 end
                             end
+
+                            param.context:save()
                         end
                     end
                 end
@@ -6776,6 +6796,8 @@ do
                             missionCommands.addCommandForGroup(groupid, 'Hack enemy comms ['..PlayerTracker.cmdShopPrices[PlayerTracker.cmdShopTypes.bribe1]..' CMD]', menu, Utils.log(context.buyCommand), context, groupname, PlayerTracker.cmdShopTypes.bribe1)
                             missionCommands.addCommandForGroup(groupid, 'Prioritize zone ['..PlayerTracker.cmdShopPrices[PlayerTracker.cmdShopTypes.prio]..' CMD]', menu, Utils.log(context.buyCommand), context, groupname, PlayerTracker.cmdShopTypes.prio)
                             missionCommands.addCommandForGroup(groupid, 'Bribe enemy officer ['..PlayerTracker.cmdShopPrices[PlayerTracker.cmdShopTypes.bribe2]..' CMD]', menu, Utils.log(context.buyCommand), context, groupname, PlayerTracker.cmdShopTypes.bribe2)
+                            missionCommands.addCommandForGroup(groupid, 'Shell zone with artillery ['..PlayerTracker.cmdShopPrices[PlayerTracker.cmdShopTypes.artillery]..' CMD]', menu, Utils.log(context.buyCommand), context, groupname, PlayerTracker.cmdShopTypes.artillery)
+                            missionCommands.addCommandForGroup(groupid, 'Sabotage enemy zone ['..PlayerTracker.cmdShopPrices[PlayerTracker.cmdShopTypes.sabotage1]..' CMD]', menu, Utils.log(context.buyCommand), context, groupname, PlayerTracker.cmdShopTypes.sabotage1)
                            
                             if CommandFunctions.jtac then
                                 missionCommands.addCommandForGroup(groupid, 'Deploy JTAC ['..PlayerTracker.cmdShopPrices[PlayerTracker.cmdShopTypes.jtac]..' CMD]', menu, Utils.log(context.buyCommand), context, groupname, PlayerTracker.cmdShopTypes.jtac)
@@ -6942,6 +6964,18 @@ do
                         end, {groupid=gr:getID()}, timer.getTime()+(60*5))
                         
                         trigger.action.outTextForGroup(gr:getID(), "Bribe has been transfered to enemy officer. Waiting for contact...",20)
+                    elseif itemType == PlayerTracker.cmdShopTypes.artillery then
+                        self.groupTgtMenus[gr:getID()] = MenuRegistry.showTargetZoneMenu(gr:getID(), "Artillery target", function(params)
+                            CommandFunctions.shellZone(params.zone, 50)
+                        end, 1, 1)
+
+                        trigger.action.outTextForGroup(gr:getID(), "Select target zone from radio menu",10)
+                    elseif itemType == PlayerTracker.cmdShopTypes.sabotage1 then
+                        self.groupTgtMenus[gr:getID()] = MenuRegistry.showTargetZoneMenu(gr:getID(), "Sabotage target", function(params)
+                            CommandFunctions.sabotageZone(params.zone)
+                        end, 1, 1)
+
+                        trigger.action.outTextForGroup(gr:getID(), "Select target zone from radio menu",10)
                     end
                     
                     self.stats[player][PlayerTracker.statTypes.cmd] = self.stats[player][PlayerTracker.statTypes.cmd] - cost
@@ -7003,6 +7037,10 @@ do
                         local multiplier = self:getPlayerMultiplier(player)
                         if multiplier then
                             message = message..'\nSurvival XP multiplier: '..string.format("%.2f", multiplier)..'x'
+                            
+                            if stats[PlayerTracker.statTypes.survivalBonus] ~= nil then
+                                message = message..' [SECURED]'
+                            end
                         end
 
                         local cmd = stats[PlayerTracker.statTypes.cmd]
@@ -7045,38 +7083,39 @@ do
 
     function PlayerTracker:periodicSave()
         timer.scheduleFunction(function(param, time)
-            local tosave = {}
-            tosave.stats = param.stats
-            tosave.config = param.config
-            
-            --temp mission stat tracking
-            tosave.zones = {}
-            tosave.zones.red = {}
-            tosave.zones.blue = {}
-            tosave.zones.neutral = {}
-            for i,v in pairs(ZoneCommand.getAllZones()) do
-                if v.side == 1 then
-                    table.insert(tosave.zones.red,v.name)
-                elseif v.side == 2 then
-                    table.insert(tosave.zones.blue,v.name)
-                elseif v.side == 0 then
-                    table.insert(tosave.zones.neutral,v.name)
-                end
-            end
-
-            tosave.players = {}
-            for i,v in ipairs(coalition.getPlayers(2)) do
-                if v and v:isExist() and v.getPlayerName then
-                    table.insert(tosave.players, {name=v:getPlayerName(), unit=v:getDesc().typeName})
-                end
-            end
-
-            --end mission stat tracking
-
-            Utils.saveTable(PlayerTracker.savefile, tosave)
-            env.info("PlayerTracker - state saved")
+            param:save()
             return time+60
         end, self, timer.getTime()+60)
+    end
+
+    function PlayerTracker:save()
+        local tosave = {}
+        tosave.stats = self.stats
+        tosave.config = self.config
+        
+        tosave.zones = {}
+        tosave.zones.red = {}
+        tosave.zones.blue = {}
+        tosave.zones.neutral = {}
+        for i,v in pairs(ZoneCommand.getAllZones()) do
+            if v.side == 1 then
+                table.insert(tosave.zones.red,v.name)
+            elseif v.side == 2 then
+                table.insert(tosave.zones.blue,v.name)
+            elseif v.side == 0 then
+                table.insert(tosave.zones.neutral,v.name)
+            end
+        end
+
+        tosave.players = {}
+        for i,v in ipairs(coalition.getPlayers(2)) do
+            if v and v:isExist() and v.getPlayerName then
+                table.insert(tosave.players, {name=v:getPlayerName(), unit=v:getDesc().typeName})
+            end
+        end
+
+        Utils.saveTable(PlayerTracker.savefile, tosave)
+        env.info("PlayerTracker - state saved")
     end
 
     PlayerTracker.ranks = {}
@@ -7115,6 +7154,25 @@ do
         end
 
         return 1.0
+    end
+
+    function PlayerTracker:getPlayerMinutes(playername)
+        if self.playerEarningMultiplier[playername] then
+            return self.playerEarningMultiplier[playername].minutes
+        end
+
+        return 0
+    end
+
+    function PlayerTracker.minutesToMultiplier(minutes)
+        local multi = 1.0
+        if minutes > 10 and minutes <= 60 then
+            multi = 1.0 + ((minutes-10)*0.05)
+        elseif minutes > 60 then
+            multi = 1.0 + (50*0.05) + ((minutes - 60)*0.025)
+        end
+
+        return math.min(multi, 5.0)
     end
 
     function PlayerTracker:getRank(xp)
@@ -8105,13 +8163,15 @@ do
         local units = {}
         for i,v in pairs(zone.built) do
             local g = Group.getByName(v.name)
-            if g then
+            if g and g:isExist() then
                 for i2,v2 in ipairs(g:getUnits()) do
-                    table.insert(units, v2)
+                    if v2:isExist() then
+                        table.insert(units, v2)
+                    end
                 end
             else
                 local s = StaticObject.getByName(v.name)
-                if s then
+                if s and s:isExist() then
                     table.insert(units, s)
                 end
             end
@@ -8130,6 +8190,100 @@ do
             local pos = v:getPoint()
             trigger.action.smoke(pos, 1)
         end
+    end
+
+    function CommandFunctions.sabotageZone(zone)
+        trigger.action.outText("Saboteurs have been dispatched to "..zone.name, 10)
+        local delay = math.random(5*60, 7*60)
+        timer.scheduleFunction(function(param, time)
+            if math.random() < 0.1 then
+                trigger.action.outText("Saboteurs have been caught by the enemy before they could complete their mission", 10)
+                return
+            end
+
+            local zone = param.zone
+            local units = {}
+            for i,v in pairs(zone.built) do
+                if v.type == 'upgrade' then
+                    local s = StaticObject.getByName(v.name)
+                    if s and s:isExist() then
+                        table.insert(units, s)
+                    end
+                end
+            end
+            
+            if #units > 0 then
+                local selected = units[math.random(1,#units)]
+
+                timer.scheduleFunction(function(p2, t2)
+                    if p2.count > 0 then
+                        p2.count = p2.count - 1
+                        local offsetPos = {
+                            x = p2.pos.x + math.random(-25,25),
+                            y = p2.pos.y,
+                            z = p2.pos.z + math.random(-25,25)
+                        }
+            
+                        offsetPos.y = land.getHeight({x = offsetPos.x, y = offsetPos.z})
+                        trigger.action.explosion(offsetPos, 30)
+                        return t2 + 0.05 + (math.random())
+                    else
+                        trigger.action.explosion(p2.pos, 2000)
+                    end
+                end, {count = 3, pos = selected:getPoint()}, timer.getTime()+0.5)
+
+                trigger.action.outText("Saboteurs have succesfully triggered explosions at "..zone.name, 10)
+            end
+        end, { zone = zone }, timer.getTime()+delay)
+    end
+
+    function CommandFunctions.shellZone(zone, count)
+        local minutes = math.random(3,7)
+        local seconds = math.random(-30,30)
+        local delay = (minutes*60)+seconds
+        trigger.action.outText("Artillery preparing to fire on "..zone.name.." ETA: "..minutes.." minutes", 10)
+        
+        local positions = {}
+        for i,v in pairs(zone.built) do
+            local g = Group.getByName(v.name)
+            if g and g:isExist() then
+                for i2,v2 in ipairs(g:getUnits()) do
+                    if v2:isExist() then
+                        table.insert(positions, v2:getPoint())
+                    end
+                end
+            else
+                local s = StaticObject.getByName(v.name)
+                if s and s:isExist() then
+                    table.insert(positions, s:getPoint())
+                end
+            end
+        end
+
+        timer.scheduleFunction(function(param, time)
+            trigger.action.outText("Artillery firing on "..param.zone.name.." ETA: 30 seconds", 10)
+        end, {zone = zone}, timer.getTime()+delay-30)
+
+        timer.scheduleFunction(function(param, time)
+            param.count = param.count - 1
+            
+            local selected = param.positions[math.random(1,#param.positions)]
+            local offsetPos = {
+                x = selected.x + math.random(-50,50),
+                y = selected.y,
+                z = selected.z + math.random(-50,50)
+            }
+
+            offsetPos.y = land.getHeight({x = offsetPos.x, y = offsetPos.z})
+
+            trigger.action.explosion(offsetPos, 20)
+
+            if param.count > 0 then
+                return time+0.05+(math.random()*2)
+            else
+                trigger.action.outText("Artillery finished firing on "..param.zone.name, 10)
+            end
+        end, { positions = positions, count = count, zone = zone}, timer.getTime()+delay)
     end
 end
 
