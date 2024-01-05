@@ -6769,7 +6769,7 @@ do
             end
 		end, self)
 
-        MenuRegistry:register(4, function(event, context)
+        MenuRegistry:register(5, function(event, context)
 			if event.id == world.event.S_EVENT_BIRTH and event.initiator and event.initiator.getPlayerName then
 				local player = event.initiator:getPlayerName()
 				if player then
@@ -6778,6 +6778,22 @@ do
 
                     local groupid = event.initiator:getGroup():getID()
                     local groupname = event.initiator:getGroup():getName()
+                    
+                    if context.groupConfigMenus[groupid] then
+                        missionCommands.removeItemForGroup(groupid, context.groupConfigMenus[groupid])
+                        context.groupConfigMenus[groupid] = nil
+                    end
+
+                    if not context.groupConfigMenus[groupid] then
+                        
+                        local menu = missionCommands.addSubMenuForGroup(groupid, 'Config')
+                        local missionWarningMenu = missionCommands.addSubMenuForGroup(groupid, 'No mission warning', menu)
+                        missionCommands.addCommandForGroup(groupid, 'Activate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, true)
+                        missionCommands.addCommandForGroup(groupid, 'Deactivate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, false)
+              
+                        context.groupConfigMenus[groupid] = menu
+                    end
+
                     if rank.cmdChance > 0 then
                         
                         if context.groupShopMenus[groupid] then
@@ -6806,21 +6822,6 @@ do
 
                             context.groupShopMenus[groupid] = menu
                         end
-                    end
-
-                    if context.groupConfigMenus[groupid] then
-                        missionCommands.removeItemForGroup(groupid, context.groupConfigMenus[groupid])
-                        context.groupConfigMenus[groupid] = nil
-                    end
-
-                    if not context.groupConfigMenus[groupid] then
-                        
-                        local menu = missionCommands.addSubMenuForGroup(groupid, 'Config')
-                        local missionWarningMenu = missionCommands.addSubMenuForGroup(groupid, 'No mission warning', menu)
-                        missionCommands.addCommandForGroup(groupid, 'Activate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, true)
-                        missionCommands.addCommandForGroup(groupid, 'Deactivate', missionWarningMenu, Utils.log(context.setNoMissionWarning), context, groupname, false)
-              
-                        context.groupConfigMenus[groupid] = menu
                     end
 				end
 			elseif (event.id == world.event.S_EVENT_PLAYER_LEAVE_UNIT or event.id == world.event.S_EVENT_DEAD) and event.initiator and event.initiator.getPlayerName then
@@ -8270,9 +8271,9 @@ do
             
             local selected = param.positions[math.random(1,#param.positions)]
             local offsetPos = {
-                x = selected.x + math.random(-50,50),
+                x = selected.x + math.random(-75,75),
                 y = selected.y,
-                z = selected.z + math.random(-50,50)
+                z = selected.z + math.random(-75,75)
             }
 
             offsetPos.y = land.getHeight({x = offsetPos.x, y = offsetPos.z})
@@ -12831,7 +12832,7 @@ do
         for _,m in pairs(self.activeMissions) do
             if m.players[player] then
                 if m.state == Mission.states.active then
-                    if Weapon.getCategory(weapon) == Weapon.Category.BOMB then
+                    if Weapon.getCategoryEx(weapon) == Weapon.Category.BOMB then
                         timer.scheduleFunction(function (params, time)
                             if not params.weapon:isExist() then
                                 return nil -- weapon despawned
@@ -13605,7 +13606,7 @@ do
     end
 
     function GCI:start()
-        MenuRegistry:register(5, function(event, context)
+        MenuRegistry:register(4, function(event, context)
 			if event.id == world.event.S_EVENT_BIRTH and event.initiator and event.initiator.getPlayerName then
 				local player = event.initiator:getPlayerName()
 				if player then
