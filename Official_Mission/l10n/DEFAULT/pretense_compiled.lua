@@ -57,7 +57,7 @@ Config.maxDistFromFront = Config.maxDistFromFront or 129640 -- max distance in m
 if Config.restrictMissionAcceptance == nil then Config.restrictMissionAcceptance = true end -- if set to true, missions can only be accepted while landed inside friendly zones
 
 Config.missions = Config.missions or {}
-
+Config.missionBoardSize = Config.missionBoardSize or 15
 
 -----------------[[ END OF Config.lua ]]-----------------
 
@@ -747,7 +747,7 @@ do
 								})
 
 								timer.scheduleFunction(function(params, time)
-									local group = params.group
+									local group = params.gr
 									local gr = Group.getByName(group.name)
 									local supplyPoint = trigger.misc.getZone(group.target.name..'-sp')
 									if not supplyPoint then
@@ -757,8 +757,6 @@ do
 									TaskExtensions.moveOnRoadToPoint(gr,  {x=supplyPoint.point.x, y=supplyPoint.point.z}, true)
 								end, {gr = group}, timer.getTime()+2)
 							end
-						elseif group.unstuck_attempts and group.unstuck_attempts > 0 then
-							group.unstuck_attempts = 0
 						end
 					elseif group.product.missionType == 'assault' then
 						local frUnit = gr:getUnit(1)
@@ -927,6 +925,7 @@ do
 		local un = gr:getUnit(1)
 		if un and un:isExist() and mist.vec.mag(un:getVelocity()) >= 0.01 and group.stuck_marker > 0 then
 			group.stuck_marker = 0
+			group.unstuck_attempts = 0
 			env.info('GroupMonitor: isStuck ['..group.name..'] is moving, reseting stuck marker velocity='..mist.vec.mag(un:getVelocity()))
 		end
 
@@ -6432,12 +6431,12 @@ do
 
     PlayerTracker.cmdShopPrices = {
         [PlayerTracker.cmdShopTypes.smoke] = 1,
-        [PlayerTracker.cmdShopTypes.prio] = 1,
-        [PlayerTracker.cmdShopTypes.jtac] = 2,
-        [PlayerTracker.cmdShopTypes.bribe1] = 1,
-        [PlayerTracker.cmdShopTypes.bribe2] = 2,
-        [PlayerTracker.cmdShopTypes.artillery] = 2,
-        [PlayerTracker.cmdShopTypes.sabotage1] = 3,
+        [PlayerTracker.cmdShopTypes.prio] = 10,
+        [PlayerTracker.cmdShopTypes.jtac] = 5,
+        [PlayerTracker.cmdShopTypes.bribe1] = 5,
+        [PlayerTracker.cmdShopTypes.bribe2] = 10,
+        [PlayerTracker.cmdShopTypes.artillery] = 15,
+        [PlayerTracker.cmdShopTypes.sabotage1] = 20,
     }
 
 	function PlayerTracker:new()
@@ -6694,23 +6693,31 @@ do
 
         local cmdChance = rank.cmdChance
         if cmdChance > 0 then 
-            local die = math.random()
-            if die <= cmdChance then
+
+            local tkns = 0
+            for i=1,10,1 do
+                local die = math.random()
+                if die <= cmdChance then 
+                    tkns = tkns + 1
+                end
+            end
+
+            if tkns > 0 then
                 if isTemp then
-                    self:addTempStat(player, 1, PlayerTracker.statTypes.cmd)
+                    self:addTempStat(player, tkns, PlayerTracker.statTypes.cmd)
                 else
-                    self:addStat(player, 1, PlayerTracker.statTypes.cmd)
+                    self:addStat(player, tkns, PlayerTracker.statTypes.cmd)
                 end
 
                 local msg = ""
                 if isTemp then
-                    msg = '+1 CMD (unclaimed)'
+                    msg = '+'..tkns..' CMD (unclaimed)'
                 else
-                    msg = '[CMD] '..self.stats[player][PlayerTracker.statTypes.cmd]..' (+1)'
+                    msg = '[CMD] '..self.stats[player][PlayerTracker.statTypes.cmd]..' (+'..tkns..')'
                 end
 
                 trigger.action.outTextForUnit(unit:getID(), msg, 5)
-                env.info("PlayerTracker.addRankRewards - Awarded "..player.." a CMD token with chance "..cmdChance.." die roll "..die)
+                env.info("PlayerTracker.addRankRewards - Awarded "..player.." "..tkns.." CMD tokens with chance "..cmdChance)
             end
         end
     end
@@ -6919,8 +6926,8 @@ do
                     elseif itemType== PlayerTracker.cmdShopTypes.prio then
 
                         self.groupTgtMenus[gr:getID()] = MenuRegistry.showTargetZoneMenu(gr:getID(), "Priority zone", function(params) 
-                            BattlefieldManager.overridePriority(2, params.zone, 2)
-                            trigger.action.outTextForGroup(params.groupid, "Blue is concentrating efforts on "..params.zone.name.." for the next hour", 5)
+                            BattlefieldManager.overridePriority(2, params.zone, 4)
+                            trigger.action.outTextForGroup(params.groupid, "Blue is concentrating efforts on "..params.zone.name.." for the next two hours", 5)
                         end, nil, 1)
                         trigger.action.outTextForGroup(gr:getID(), "Select target from radio menu",10)
 
@@ -7057,6 +7064,11 @@ do
                         if tempxp and tempxp > 0 then
                             message = message .. '\nUnclaimed XP: '..tempxp
                         end
+
+                        local tempcmd =  tstats[PlayerTracker.statTypes.cmd]
+                        if tempcmd and tempcmd > 0 then
+                            message = message .. '\nUnclaimed CMD: '..tempcmd
+                        end
                     end
 
                     trigger.action.outTextForUnit(v:getID(), message, 10)
@@ -7125,20 +7137,20 @@ do
     PlayerTracker.ranks[3] =  { rank=3,  name='E-3 Airman first class',     requiredXP = 4500,     cmdChance = 0,       cmdAward=0}
     PlayerTracker.ranks[4] =  { rank=4,  name='E-4 Senior airman',          requiredXP = 7700,     cmdChance = 0,       cmdAward=0}
     PlayerTracker.ranks[5] =  { rank=5,  name='E-5 Staff sergeant',         requiredXP = 11800,    cmdChance = 0,       cmdAward=0}
-    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01,    cmdAward=1}
-    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.03,    cmdAward=1}
-    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.06,    cmdAward=1}
-    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.10,    cmdAward=1}
-    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.14,    cmdAward=2}
-    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.20,    cmdAward=2}
-    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.27,    cmdAward=2}
-    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.34,    cmdAward=2}
-    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.43,    cmdAward=3}
-    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.52,    cmdAward=3}
-    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.63,    cmdAward=3}
-    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.74,    cmdAward=4}
-    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.87,    cmdAward=4}
-    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 1.00,    cmdAward=5}
+    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01,    cmdAward=5}
+    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.03,    cmdAward=5}
+    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.06,    cmdAward=10}
+    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.10,    cmdAward=10}
+    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.14,    cmdAward=20}
+    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.20,    cmdAward=20}
+    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.27,    cmdAward=25}
+    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.34,    cmdAward=25}
+    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.43,    cmdAward=25}
+    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.52,    cmdAward=30}
+    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.63,    cmdAward=35}
+    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.74,    cmdAward=40}
+    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.87,    cmdAward=45}
+    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 1.00,    cmdAward=50}
 
     function PlayerTracker:getPlayerRank(playername)
         if self.stats[playername] then
@@ -8270,9 +8282,9 @@ do
             
             local selected = param.positions[math.random(1,#param.positions)]
             local offsetPos = {
-                x = selected.x + math.random(-75,75),
+                x = selected.x + math.random(-50,50),
                 y = selected.y,
-                z = selected.z + math.random(-75,75)
+                z = selected.z + math.random(-50,50)
             }
 
             offsetPos.y = land.getHeight({x = offsetPos.x, y = offsetPos.z})
@@ -11687,7 +11699,7 @@ do
             if firstWP and firstWP.zone:hasUnitWithAttributeOnSide({'Buildings'}, 1) then
                 local tgt = firstWP.zone:getRandomUnitWithAttributeOnSide({'Buildings'}, 1)
                 if tgt then
-                    MissionTargetRegistry.addStrikeTarget(tgt, firstWP.zone, true)
+                    MissionTargetRegistry.addStrikeTarget(tgt, firstWP.zone, false)
                     self:pushMessageToPlayers(tgt.display..' discovered at '..firstWP.zone.name)
                     firstWP.zone:reveal()
                 end
@@ -12259,27 +12271,27 @@ end
 MissionTracker = {}
 do
     MissionTracker.maxMissionCount = {
-        [Mission.types.cap_easy] = 1,
+        [Mission.types.cap_easy] = 2,
         [Mission.types.cap_medium] = 1,
-        [Mission.types.cas_easy] = 1,
+        [Mission.types.cas_easy] = 2,
         [Mission.types.cas_medium] = 1,
         [Mission.types.cas_hard] = 1,
         [Mission.types.sead] = 3,
-        [Mission.types.supply_easy] = 1,
+        [Mission.types.supply_easy] = 3,
         [Mission.types.supply_hard] = 1,
-        [Mission.types.strike_veryeasy] = 1,
+        [Mission.types.strike_veryeasy] = 2,
         [Mission.types.strike_easy] = 1,
         [Mission.types.strike_medium] = 3,
         [Mission.types.strike_hard] = 1,
         [Mission.types.dead] = 1,
-        [Mission.types.escort] = 1,
+        [Mission.types.escort] = 2,
         [Mission.types.tarcap] = 1,
-        [Mission.types.recon_plane] = 1,
-        [Mission.types.recon_plane_deep] = 1,
+        [Mission.types.recon_plane] = 3,
+        [Mission.types.recon_plane_deep] = 3,
         [Mission.types.deep_strike] = 3,
-        [Mission.types.scout_helo] = 1,
+        [Mission.types.scout_helo] = 3,
         [Mission.types.bai] = 1,
-        [Mission.types.anti_runway] = 1,
+        [Mission.types.anti_runway] = 2,
         [Mission.types.csar] = 1,
         [Mission.types.extraction] = 1,
         [Mission.types.deploy_squad] = 3,
@@ -12293,7 +12305,7 @@ do
         end
     end
 
-    MissionTracker.missionBoardSize = 10
+    MissionTracker.missionBoardSize = Config.missionBoardSize or 15
 
 	function MissionTracker:new()
 		local obj = {}
@@ -13329,6 +13341,12 @@ do
                             for _,v in pairs(zn.neighbours) do
                                 if v.side ~= gr:getCoalition() and v.side ~= 0 then
                                     v:reveal()
+                                    if v:hasUnitWithAttributeOnSide({'Buildings'}, v.side) then
+                                        local tgt = v:getRandomUnitWithAttributeOnSide({'Buildings'}, v.side)
+                                        if tgt then
+                                            MissionTargetRegistry.addStrikeTarget(tgt, v, v.distToFront >= 2)
+                                        end
+                                    end
                                 end
                             end
                         end
@@ -13490,7 +13508,7 @@ do
         local name = nil
 
         for i,v in pairs(self.activePilots) do
-            if v.pilot:isExist() and v.remainingTime > 0 then
+            if v.pilot:isExist() and v.pilot:getSize()>0 and v.pilot:getUnit(1):isExist() and v.remainingTime > 0 then
                 local dist = mist.utils.get2DDist(toPosition, v.pilot:getUnit(1):getPoint())
                 if dist<minDist then
                     minDist = dist
@@ -13636,7 +13654,7 @@ do
                         missionCommands.addCommandForGroup(groupid, '25 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 25, false)
                         missionCommands.addCommandForGroup(groupid, '50 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 50, false)
                         missionCommands.addCommandForGroup(groupid, '80 NM', nmMenu, Utils.log(context.registerPlayer), context, player, unit, 80, false)
-                        missionCommands.addCommandForGroup(groupid, 'Disable', menu, Utils.log(context.registerPlayer), context, player, unit, 0, false)
+                        missionCommands.addCommandForGroup(groupid, 'Disable Warning Radius', menu, Utils.log(context.registerPlayer), context, player, unit, 0, false)
 
                         context.groupMenus[groupid] = menu
                     end
