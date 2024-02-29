@@ -2,10 +2,10 @@ mapResource =
 {
     ["ResKey_ImageBriefing_17"] = "cover_syria_modern_small.jpg",
     ["ResKey_Action_12"] = "endscreen.jpg",
-    ["ResKey_Action_9"] = "fail.ogg",
-    ["ResKey_Action_16"] = "endsong2.ogg",
     ["ResKey_Action_13"] = "endsong.ogg",
+    ["ResKey_Action_16"] = "endsong2.ogg",
+    ["mist"] = "Load_Scripts.lua",
     ["ResKey_Action_10"] = "success.ogg",
-    ["ResKey_Action_20"] = "Load_Scripts.lua",
+    ["ResKey_Action_9"] = "fail.ogg",
     ["ResKey_Action_15"] = "endscreen2.jpg",
 } -- end of mapResource
