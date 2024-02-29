@@ -84,38 +84,9 @@ local function vip_reset(_player_id)
     end
 end
 
-
--- Slot block check
-
-local function slot_block_check(_slot_id)
-    local _group_name = DCS.getUnitProperty(_slot_id, DCS.UNIT_GROUPNAME)
-    local _status, _error = net.dostring_in('server', "return trigger.misc.getUserFlag(\"" .. _group_name .. "\")")
-
-    if _status and tonumber(_status) == 1 then
-        return "该机位(" .. _group_name .. ")所在机场尚未被所属阵营占领。"
-    end
-end
-
-local function kick_user_to_spectator(_player_id, _resaon)
-    net.send_chat_to(_resaon, _player_id)
-    net.force_player_slot(_player_id, 0, '')
-
-    return false
-end
-
-
 -- Set user callbacks
 
 local user_callbacks = {}
-
--- This will tirgger once a player selects a slot
-function user_callbacks.onPlayerTryChangeSlot(_player_id, _side, _slot_id)
-    local _reason = slot_block_check(_slot_id)
-
-    if _reason ~= nil then
-        return kick_user_to_spectator(_player_id, _reason)
-    end
-end
 
 -- This will tirgger once a player gets into a slot successfully (player is assigned to the slot)
 function user_callbacks.onPlayerChangeSlot(_player_id)
