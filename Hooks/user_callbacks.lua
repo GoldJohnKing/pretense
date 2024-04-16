@@ -55,6 +55,12 @@ local vip_list = {
         welcome_audio = "SheBiao_Welcome.ogg",
         online = false,
     },
+    -- RABBIT-01
+    ["873d5ebd08268a9050d14a3af746ce63"] = {
+        welcome_text = "“野生的RABBIT出现了！”",
+        welcome_audio = "Rabbit_Welcome.ogg",
+        online = false,
+    },
 }
 
 local welcome_text_prefix = "===== VIP 上线提醒 =====\\n"
