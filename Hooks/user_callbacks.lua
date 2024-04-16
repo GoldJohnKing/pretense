@@ -84,6 +84,41 @@ local function vip_reset(_player_id)
     end
 end
 
+
+-- Default player name check
+local default_name_list = {
+    'Player',
+    'Joueur',
+    'Spieler',
+    'Игрок',
+    'Jugador',
+    '玩家',
+    'Hráč',
+    '플레이어'
+}
+
+local function is_default_player_name(_player_name)
+    for key, value in pairs(default_name_list) do
+        if value:lower() == _player_name then
+            return true
+        end
+    end
+
+    return false
+end
+
+
+-- Invalid player name check
+local function is_invalid_player_name(_player_name)
+    local substr = _player_name:gsub("[\r\n%z]", "")
+    if _player_name ~= substr then
+        return true
+    end
+
+    return false
+end
+
+
 -- Set user callbacks
 
 local user_callbacks = {}
@@ -96,6 +131,19 @@ end
 -- This will trigger once player connect to server
 function user_callbacks.onPlayerConnect(_player_id)
     vip_reset(_player_id)
+end
+
+-- This will trigger once player tries to connect to server
+function user_callbacks.onPlayerTryConnect(_player_ip, _player_name, _player_ucid, _player_id)
+    -- Default player name check
+    if is_default_player_name(_player_name) then
+        return false, "您的昵称为默认昵称，本服务器禁止使用默认昵称，请更改后再试"
+    end
+
+    -- Invalid character check
+    if is_invalid_player_name(_player_name) then
+        return false, "您的昵称中包含特殊字符，请删除特殊字符后再试"
+    end
 end
 
 DCS.setUserCallbacks(user_callbacks)
