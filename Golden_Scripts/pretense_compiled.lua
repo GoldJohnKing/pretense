@@ -7178,7 +7178,7 @@ do
                 env.info('PlayerTracker - '..player..' checking if landed: '..tostring(isLanded))
 
                 if isLanded then
-                    if zn.isCarrier then
+                    if zn and zn.isCarrier then -- Edited, fix nil issue
                         zn:addResource(Config.carrierSpawnCost)
                     else
                         zn:addResource(Config.zoneSpawnCost)
