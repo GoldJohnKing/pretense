@@ -7,7 +7,7 @@ options =
         ["TrackIR_external_views"] = false,
         ["f11_free_camera"] = true,
         ["f10_awacs"] = true,
-        ["Coordinate_Display"] = "MGRS",
+        ["Coordinate_Display"] = "Precise Lat Long",
         ["accidental_failures"] = false,
         ["Datum"] = 1,
         ["show_pilot_body"] = false,
@@ -55,7 +55,7 @@ options =
         ["externalViews"] = true,
         ["controlsIndicator"] = false,
         ["easyCommunication"] = false,
-        ["units"] = "imperial",
+        ["units"] = "metric",
         ["userMarks"] = true,
         ["labels"] = 3,
     }, -- end of ["difficulty"]
@@ -134,7 +134,7 @@ options =
         ["width"] = 1920,
         ["SSAO"] = 0,
         ["LensEffects"] = 3,
-        ["sync"] = false,
+        ["sync"] = true,
         ["Sharpening"] = 0.3,
         ["LODmult"] = 1,
         ["height"] = 1848,
@@ -225,6 +225,12 @@ options =
             ["VOICELOCALE"] = 0,
             ["IcingOnCake"] = true,
         }, -- end of ["JF-17"]
+        ["P47D30"] = 
+        {
+            ["assistance"] = 0,
+            ["CPLocalList"] = "default",
+            ["autoRudder"] = false,
+        }, -- end of ["P47D30"]
         ["VoiceChat"] = 
         {
             ["use_turn_servers_enabled"] = false,
@@ -258,6 +264,12 @@ options =
             ["enable_FLOLS_overlay"] = true,
             ["Use_native_ATC_text"] = false,
         }, -- end of ["Supercarrier"]
+        ["FW-190A8"] = 
+        {
+            ["assistance"] = 0,
+            ["CPLocalList"] = "default",
+            ["autoRudder"] = false,
+        }, -- end of ["FW-190A8"]
         ["MiG-19P"] = 
         {
             ["GYROERR_Disable"] = false,
@@ -267,12 +279,69 @@ options =
             ["ACHS1_System_Time"] = false,
             ["RP5_Ground_Return"] = 0,
         }, -- end of ["MiG-19P"]
-        ["A-10C"] = 
+        ["CaptoGlove"] = 
         {
-            ["throttleSlewTGP"] = 5,
-            ["CPLocalList"] = "default",
-            ["throttleSlewMaverick"] = 5,
-        }, -- end of ["A-10C"]
+            ["fingerPinkyBentRight"] = "0",
+            ["armBending"] = 60,
+            ["shoulderJointX_Right"] = -15,
+            ["fingerPinkyStraightRight"] = "1000",
+            ["mouseClickSrc"] = 0,
+            ["shoulderJointZ_Left"] = 23,
+            ["trackerHMDnameRight"] = "DISABLE",
+            ["set_attach"] = false,
+            ["fingerMiddleBentLeft"] = "0",
+            ["gloveRotationPitch_Left"] = 0,
+            ["fingerMiddleStraightRight"] = "1000",
+            ["yawOffsetGlove_Left"] = 0,
+            ["yawOffsetShoulder_Right"] = 0,
+            ["fingerThumbStraightLeft"] = "1000",
+            ["gloveOffsetY_Right"] = 0,
+            ["gloveOffsetX_Left"] = 0,
+            ["shoulderJointY_Left"] = -23,
+            ["gloveRotationYaw_Right"] = 0,
+            ["trackerHMDnameLeft"] = "DISABLE",
+            ["set_symmetrically"] = false,
+            ["fingerIndexStraightRight"] = "1000",
+            ["pitchOffsetGlove_Right"] = 0,
+            ["fingerIndexBentRight"] = "0",
+            ["gloveOffsetZ_Right"] = 0,
+            ["shoulderJointZ_Right"] = 23,
+            ["useHMDControl"] = false,
+            ["pitchOffsetShoulder_Left"] = 0,
+            ["fingerMiddleStraightLeft"] = "1000",
+            ["pitchOffsetShoulder_Right"] = 0,
+            ["fingerRingStraightLeft"] = "1000",
+            ["fingerThumbBentRight"] = "0",
+            ["shoulderJointX_Left"] = -15,
+            ["enable"] = false,
+            ["gloveOffsetY_Left"] = 0,
+            ["fingerMiddleBentRight"] = "0",
+            ["fingerRingBentLeft"] = "0",
+            ["forearmLength_Right"] = 30,
+            ["fingerThumbStraightRight"] = "1000",
+            ["gloveOffsetZ_Left"] = 0,
+            ["shoulderLength_Right"] = 40,
+            ["fingerPinkyStraightLeft"] = "1000",
+            ["gloveRotationYaw_Left"] = 0,
+            ["gloveRotationPitch_Right"] = 0,
+            ["forearmLength_Left"] = 30,
+            ["set_debug"] = false,
+            ["useBending"] = false,
+            ["fingerRingBentRight"] = "0",
+            ["shoulderJointY_Right"] = -23,
+            ["gloveRotationRoll_Left"] = 0,
+            ["fingerIndexBentLeft"] = "0",
+            ["shoulderLength_Left"] = 40,
+            ["yawOffsetShoulder_Left"] = 0,
+            ["fingerRingStraightRight"] = "1000",
+            ["fingerIndexStraightLeft"] = "1000",
+            ["yawOffsetGlove_Right"] = 0,
+            ["gloveOffsetX_Right"] = 0,
+            ["pitchOffsetGlove_Left"] = 0,
+            ["fingerThumbBentLeft"] = "0",
+            ["gloveRotationRoll_Right"] = 0,
+            ["fingerPinkyBentLeft"] = "0",
+        }, -- end of ["CaptoGlove"]
         ["Ka-50"] = 
         {
             ["Ka50TrimmingMethod"] = 0,
@@ -351,6 +420,10 @@ options =
             ["set_debug"] = false,
             ["mouseClickSrc"] = 0,
         }, -- end of ["UltraLeap"]
+        ["Olympus"] = 
+        {
+            ["olympusModuleEnabled"] = false,
+        }, -- end of ["Olympus"]
         ["DCS-SRS"] = 
         {
             ["srsOverlayHelpTextEnabled"] = false,
@@ -398,6 +471,12 @@ options =
             ["handUseStick"] = false,
             ["mouseClickSrc"] = 0,
         }, -- end of ["LeapMotion"]
+        ["FW-190D9"] = 
+        {
+            ["assistance"] = 0,
+            ["CPLocalList"] = "default",
+            ["autoRudder"] = false,
+        }, -- end of ["FW-190D9"]
         ["Mirage-F1"] = 
         {
             ["F1MinFFBRoll"] = 50,
@@ -416,72 +495,6 @@ options =
             ["F1ALR300VoiceLang"] = 3,
             ["F1AutoCounterSet"] = true,
         }, -- end of ["Mirage-F1"]
-        ["M-2000C"] = 
-        {
-            ["FUEL_DETOT_AUTO"] = true,
-            ["CPLocalList"] = "English",
-            ["THROTTLE_CO_DETENT"] = 15,
-            ["RADIO_PTTMENU"] = true,
-            ["REAL_FREQ_REP"] = true,
-            ["REFUEL_HACK"] = true,
-            ["VTB_FOV_ENABLE"] = true,
-            ["RAND_RDR_CHANNEL"] = true,
-            ["VTB_FOV_HEIGHT"] = 150,
-            ["VTB_ENLARGE"] = 0,
-            ["VTB_FOV_SIZE"] = 130,
-            ["EZ_LAUNCH_ALERT"] = false,
-            ["RADAR_CLUTTERQMC"] = true,
-            ["ENGINE_LOG"] = false,
-            ["UNI_ALIGNED"] = true,
-            ["PITCH_LIMIT_MODE"] = 1,
-            ["UNI_NODRIFT"] = false,
-            ["THROTTLE_AB_DETENT"] = 90,
-            ["MW_KNOBS_SPEED"] = 0,
-            ["PITCH_ELASTIC_LIMIT"] = 80,
-            ["RADAR_MAPOBJECTS"] = true,
-            ["PCN_DIGIT_MSG"] = true,
-        }, -- end of ["M-2000C"]
-        ["F-16C"] = 
-        {
-            ["abDetent"] = 0,
-            ["canopyReflections"] = 1,
-            ["hmdEye"] = 1,
-            ["CPLocalList"] = "default",
-            ["canopyTint"] = 0,
-            ["mfdReflections"] = 1,
-        }, -- end of ["F-16C"]
-        ["A-10C_2"] = 
-        {
-            ["throttleSlewTGP"] = 5,
-            ["hmdEye"] = 1,
-            ["CPLocalList"] = "factory_new",
-            ["throttleSlewMaverick"] = 5,
-            ["defaultGunMode"] = 0,
-        }, -- end of ["A-10C_2"]
-        ["A-4E-C"] = 
-        {
-            ["cssActivate"] = 15,
-            ["wheelBrakeAssist"] = false,
-            ["oldRadar"] = false,
-            ["customRudderPressure"] = 50,
-            ["trimSpeedRudder"] = 100,
-            ["customPitchPressure"] = 50,
-            ["throttleRate"] = 1,
-            ["customRudderRelease"] = 100,
-            ["trimSpeedPitch"] = 100,
-            ["cockpitShake"] = 100,
-            ["customRollRelease"] = 100,
-            ["customPitchRelease"] = 0,
-            ["throttleAcceleration"] = 50,
-            ["trimSpeedRoll"] = 100,
-            ["customRollPressure"] = 50,
-        }, -- end of ["A-4E-C"]
-        ["TF-51D"] = 
-        {
-            ["assistance"] = 100,
-            ["CPLocalList"] = "default",
-            ["autoRudder"] = false,
-        }, -- end of ["TF-51D"]
         ["Mi-24P"] = 
         {
             ["CPLocalList"] = "english",
@@ -503,23 +516,62 @@ options =
             ["Mi24PedalsAutoMove"] = true,
             ["weapTooltipsMi24"] = false,
         }, -- end of ["Mi-24P"]
-        ["Ka-50_3"] = 
+        ["M-2000C"] = 
         {
-            ["Ka50TrimmingMethod"] = 0,
-            ["Ka50RudderTrimmer"] = false,
-            ["hmdEye"] = 1,
-            ["Ka50PedalsYawReqReset"] = false,
-            ["CPLocalList"] = "english",
-            ["helmetCircleDisplacement"] = 11,
-        }, -- end of ["Ka-50_3"]
-        ["Su-25T"] = 
+            ["FUEL_DETOT_AUTO"] = true,
+            ["CPLocalList"] = "English",
+            ["THROTTLE_CO_DETENT"] = 15,
+            ["RADIO_PTTMENU"] = true,
+            ["REAL_FREQ_REP"] = true,
+            ["EZ_LAUNCH_ALERT"] = false,
+            ["REFUEL_HACK"] = true,
+            ["PITCH_LIMIT_MODE"] = 1,
+            ["RAND_RDR_CHANNEL"] = true,
+            ["VTB_FOV_HEIGHT"] = 150,
+            ["RADAR_CLUTTERQMC"] = true,
+            ["VTB_FOV_SIZE"] = 130,
+            ["VTB_FOV_ENABLE"] = true,
+            ["THROTTLE_AB_DETENT"] = 90,
+            ["ENGINE_LOG"] = false,
+            ["UNI_ALIGNED"] = true,
+            ["UNI_NODRIFT"] = false,
+            ["VTB_ENLARGE"] = 0,
+            ["COCKPIT_WEAR"] = 50,
+            ["MW_KNOBS_SPEED"] = 0,
+            ["PITCH_ELASTIC_LIMIT"] = 80,
+            ["RADAR_MAPOBJECTS"] = true,
+            ["PCN_DIGIT_MSG"] = true,
+        }, -- end of ["M-2000C"]
+        ["TF-51D"] = 
         {
+            ["assistance"] = 100,
             ["CPLocalList"] = "default",
-        }, -- end of ["Su-25T"]
-        ["AJS37"] = 
+            ["autoRudder"] = false,
+        }, -- end of ["TF-51D"]
+        ["F-16C"] = 
         {
-            ["CPLocalList"] = "Imperial stickers",
-        }, -- end of ["AJS37"]
+            ["abDetent"] = 0,
+            ["canopyReflections"] = 1,
+            ["hmdEye"] = 1,
+            ["CPLocalList"] = "default",
+            ["canopyTint"] = 0,
+            ["mfdReflections"] = 1,
+        }, -- end of ["F-16C"]
+        ["A-10C_2"] = 
+        {
+            ["throttleSlewTGP"] = 5,
+            ["hmdEye"] = 1,
+            ["CPLocalList"] = "factory_new",
+            ["throttleSlewMaverick"] = 5,
+            ["defaultGunMode"] = 0,
+        }, -- end of ["A-10C_2"]
+        ["SpitfireLFMkIX"] = 
+        {
+            ["assistance"] = 0,
+            ["CPLocalList"] = "default",
+            ["aileronTrim"] = 0,
+            ["autoRudder"] = false,
+        }, -- end of ["SpitfireLFMkIX"]
         ["F-15ESE"] = 
         {
             ["RAND_RDR_CHANNEL"] = false,
@@ -538,75 +590,80 @@ options =
             ["FF_ROLL_GAIN"] = 65,
             ["LOW_END_TEXT"] = false,
         }, -- end of ["F-15ESE"]
+        ["A-4E-C"] = 
+        {
+            ["cssActivate"] = 15,
+            ["wheelBrakeAssist"] = false,
+            ["oldRadar"] = false,
+            ["customRudderPressure"] = 50,
+            ["trimSpeedRudder"] = 100,
+            ["customPitchPressure"] = 50,
+            ["throttleRate"] = 1,
+            ["customRudderRelease"] = 100,
+            ["trimSpeedPitch"] = 100,
+            ["cockpitShake"] = 100,
+            ["customRollRelease"] = 100,
+            ["customPitchRelease"] = 0,
+            ["throttleAcceleration"] = 50,
+            ["trimSpeedRoll"] = 100,
+            ["customRollPressure"] = 50,
+        }, -- end of ["A-4E-C"]
+        ["A-10C"] = 
+        {
+            ["throttleSlewTGP"] = 5,
+            ["CPLocalList"] = "default",
+            ["throttleSlewMaverick"] = 5,
+        }, -- end of ["A-10C"]
+        ["Su-25T"] = 
+        {
+            ["CPLocalList"] = "default",
+        }, -- end of ["Su-25T"]
+        ["Ka-50_3"] = 
+        {
+            ["Ka50TrimmingMethod"] = 0,
+            ["Ka50RudderTrimmer"] = false,
+            ["hmdEye"] = 1,
+            ["Ka50PedalsYawReqReset"] = false,
+            ["CPLocalList"] = "english",
+            ["helmetCircleDisplacement"] = 11,
+        }, -- end of ["Ka-50_3"]
+        ["FC3"] = 
+        {
+            ["CPLocalList_Su-25"] = "default",
+            ["CPLocalList_Su-27"] = "default",
+            ["CPLocalList_A-10A"] = "default",
+            ["CPLocalList_Su-33"] = "default",
+            ["CPLocalList_F-15C"] = "default",
+            ["CPLocalList_MiG-29A"] = "default",
+            ["CPLocalList_J-11A"] = "default",
+            ["CPLocalList_MiG-29G"] = "default",
+            ["CPLocalList_MiG-29S"] = "default",
+        }, -- end of ["FC3"]
+        ["AJS37"] = 
+        {
+            ["CPLocalList"] = "Imperial stickers",
+        }, -- end of ["AJS37"]
+        ["MosquitoFBMkVI"] = 
+        {
+            ["cameraOrigin"] = 0,
+            ["assistance"] = 0,
+            ["CPLocalList"] = "default",
+            ["autoRudder"] = false,
+            ["thtldetent"] = 0,
+        }, -- end of ["MosquitoFBMkVI"]
         ["UH-60L"] = 
         {
             ["pedalTrimOption"] = true,
             ["aimingMarkRemove"] = false,
             ["infosOption"] = true,
         }, -- end of ["UH-60L"]
-        ["CaptoGlove"] = 
+        ["P-51D"] = 
         {
-            ["fingerPinkyBentRight"] = "0",
-            ["armBending"] = 60,
-            ["shoulderJointX_Right"] = -15,
-            ["fingerPinkyStraightRight"] = "1000",
-            ["mouseClickSrc"] = 0,
-            ["shoulderJointZ_Left"] = 23,
-            ["trackerHMDnameRight"] = "DISABLE",
-            ["set_attach"] = false,
-            ["fingerMiddleBentLeft"] = "0",
-            ["gloveRotationPitch_Left"] = 0,
-            ["fingerMiddleStraightRight"] = "1000",
-            ["yawOffsetGlove_Left"] = 0,
-            ["yawOffsetShoulder_Right"] = 0,
-            ["fingerThumbStraightLeft"] = "1000",
-            ["gloveOffsetY_Right"] = 0,
-            ["gloveOffsetX_Left"] = 0,
-            ["shoulderJointY_Left"] = -23,
-            ["gloveRotationYaw_Right"] = 0,
-            ["trackerHMDnameLeft"] = "DISABLE",
-            ["set_symmetrically"] = false,
-            ["fingerIndexStraightRight"] = "1000",
-            ["pitchOffsetGlove_Right"] = 0,
-            ["fingerIndexBentRight"] = "0",
-            ["gloveOffsetZ_Right"] = 0,
-            ["shoulderJointZ_Right"] = 23,
-            ["useHMDControl"] = false,
-            ["pitchOffsetShoulder_Left"] = 0,
-            ["fingerMiddleStraightLeft"] = "1000",
-            ["pitchOffsetShoulder_Right"] = 0,
-            ["fingerRingStraightLeft"] = "1000",
-            ["fingerThumbBentRight"] = "0",
-            ["shoulderJointX_Left"] = -15,
-            ["enable"] = false,
-            ["gloveOffsetY_Left"] = 0,
-            ["fingerMiddleBentRight"] = "0",
-            ["fingerRingBentLeft"] = "0",
-            ["forearmLength_Right"] = 30,
-            ["fingerThumbStraightRight"] = "1000",
-            ["gloveOffsetZ_Left"] = 0,
-            ["shoulderLength_Right"] = 40,
-            ["fingerPinkyStraightLeft"] = "1000",
-            ["gloveRotationYaw_Left"] = 0,
-            ["gloveRotationPitch_Right"] = 0,
-            ["forearmLength_Left"] = 30,
-            ["set_debug"] = false,
-            ["useBending"] = false,
-            ["fingerRingBentRight"] = "0",
-            ["shoulderJointY_Right"] = -23,
-            ["gloveRotationRoll_Left"] = 0,
-            ["fingerIndexBentLeft"] = "0",
-            ["shoulderLength_Left"] = 40,
-            ["yawOffsetShoulder_Left"] = 0,
-            ["fingerRingStraightRight"] = "1000",
-            ["fingerIndexStraightLeft"] = "1000",
-            ["yawOffsetGlove_Right"] = 0,
-            ["gloveOffsetX_Right"] = 0,
-            ["pitchOffsetGlove_Left"] = 0,
-            ["fingerThumbBentLeft"] = "0",
-            ["gloveRotationRoll_Right"] = 0,
-            ["fingerPinkyBentLeft"] = "0",
-        }, -- end of ["CaptoGlove"]
+            ["assistance"] = 0,
+            ["CPLocalList_P51D25NA"] = "default",
+            ["CPLocalList_P51D30NA"] = "default",
+            ["autoRudder"] = false,
+        }, -- end of ["P-51D"]
     }, -- end of ["plugins"]
     ["format"] = 1,
     ["sound"] = 
