@@ -1,3 +1,5 @@
+## :warning: Pretense is no longer being developed or supported.  The state of the game, it's pace of development, and EDs conduct, has killed all interest I had in making things for DCS. Thank you to the people who supported me these past few years.
+
 [![Pretense](/images/cover_banner.jpg)](https://www.digitalcombatsimulator.com/en/files/3331159/)
 [![Pretense Syria Cold War](/images/cover_syria_banner.jpg)](https://www.digitalcombatsimulator.com/en/files/3332140/)
 [![Pretense Syria](/images/cover_syria_modern_banner.jpg)](https://www.digitalcombatsimulator.com/en/files/3332520/)
@@ -61,14 +63,6 @@ If, after you get the chance to play it a bit, you consider I deserve it, feel f
 9. [Issue reporting](#9-issue-reporting)
     1. [Knows issues with 3rd party scripts](#91-knows-issues-with-3rd-party-scripts)
 10. [FAQ](#10-faq)
-    1. [Is it compatible with IADS, CTLD, etc. scripts?](#101-is-it-compatible-with-iads-ctld-etc-scripts)
-    2. [I've added the hercules mod, but airdropped units just disapear](#102-ive-added-the-hercules-mod-but-airdropped-units-just-disapear)
-    3. [I've added CTLD/Hercules script, but deployed units are not saved after the mission is restarted.](#103-ive-added-ctldhercules-script-but-deployed-units-are-not-saved-after-the-mission-is-restarted)
-    4. [It's too difficult/too easy](#104-its-too-difficulttoo-easy)
-    5. [I've conquered all zones up to the mountains but now gameplay has slowed down significantly, and flight times across the mountains are too long.](#105-ive-conquered-all-zones-up-to-the-mountains-but-now-gameplay-has-slowed-down-significantly-and-flight-times-across-the-mountains-are-too-long)
-    6. [Can I play this in singleplayer?](#106-can-i-play-this-in-singleplayer)
-    7. [FC3 aircraft are cold start even in the hot start version of the mission](#107-fc3-aircraft-are-cold-start-even-in-the-hot-start-version-of-the-mission)
-    8. [Will you do a version for *[insert map]* ?](#108-will-you-do-a-version-for-insert-map)
 11. [Changelog](#11-changelog)
 
 ## 1. The Battlefield
@@ -148,7 +142,6 @@ In the case of enemy zones, only the name of the zone will be displayed, unless 
 
 ### 1.6 Player Spawns
 
-
 Players can spawn in certain zones as long as it is controlled by the blue coalition. These zones are marked on the map with a green outline.
 
 ### 1.7 Capturing a zone
@@ -162,6 +155,58 @@ Once the zone is neutral it can be captured in one of 3 ways:
 - A player deploys a capture squad inside the zone and the squad finishes their mission
 
 >Note: Defensive groups do not have to be destroyed for a zone to turn neutral, and they can keep defending the area even after the coalition lost control of the zone.
+
+### 1.8 Carriers
+
+Carriers look similar to regular zones but behave differently in a number of ways:
+
+- The zone follows the carrier as it moves
+- Carriers do not build and deploy AI missions autonomously
+- Carrier resources are deducted each time a player takes off from the carrier and refunded when a player lands at a carrier
+- If the carrier has run out of resources player spawns are restricted
+- Carriers dont get resupplied automatically by the AI, but can be resupplied by players by bringing in supplies from a regular zone, or simply landing any aircraft on the carrier, which will award one aircrafts worth of resources
+
+Players can call in various AI support missions from a carrier after they reach the rank of `O-3 Captain`. Calling in support uses the resources of the carrier. If there are insufficient resources available, the support can not be called in.
+
+The following AI support types can be called in from the Carrier:
+|Name|Description|Cost|
+|:--:|:----------|:--:|
+|CAP|Patrols around a selected frontline zone|1000|
+|Strike|Bombs structures in the selected zone. Only zones that have their information revealed are valid targets|2000|
+|Tanker|Orbits around selected friendly zone and provides refueling services|3000|
+|AWACS|Orbits around selected friendly zone and provides AWACS services|5000|
+|Transport Helo|Transport helicopter flies to and lands at the target zone, capturing it if its neutral, and delivering supplies to it|3000|
+|Cruise Missiles|Launches cruise missiles at targets in the selected zone. Only zones that have their information revealed are valid targets. Limited uses available per campaign.|10000|
+
+Players who reach the rank of `O-7 Brigadier general` can move the carrier using the navigation radio menu of the carrier. The carrier can be commanded to either move to one of the waypoints displayed on the map and wait there, or patrol around one of the displayed zones on the map.
+
+Use the `Other->Naval Command->[name]->Information` option in the radio menu to access information of the carrier like radio frequencies and channels.
+
+### 1.9 Recon
+
+Players have the ability to perform Reconnaissance on enemy zones which will provide a number of benefits.
+A succefully conducted recon will have the following benefits:
+- records a random structure in the zone as a strike target, which allows strike missions to be generated against that target with precise coordinates provided in the briefing
+- reveal resources and production information of zone on the map for a limited time
+- while information is revealed on a zone:
+    - the artillery CMD option has increased accuracy
+    - the sabotage CMD option has 100% success rate
+    - strike missions can be called in against the zone from the carrier (if available)
+
+To perform Recon succesfully you have to follow these steps:
+
+1. While near your intended target zone, activate recon by selecting the `Other->Recon->Start` option in the radio menu.
+2. You will be shown the required parameters for the nearest zone
+3. Once you are within parameters data recording will start, with your progress being displayed
+    b. The first zone you start progress on will be locked in and progress can only be made on that zone
+    b. If you get outside parameters, progress is not lost, but will stop increasing until you return
+    c. If no progress is recorded for 5 minutes, recon is canceled and will need to be started again
+4. Once recon is complete, return and land at a friendly zone
+5. Select the `Other->Recon->Analyze` option from the radio menu to finalize recon and claim its rewards.
+
+Recon can be performed in any aircraft but required parameters and rate of progress will depend on aircraft used.
+
+> Note: Due to DCS scripting API limitations the mission can not check if you actually have targeting/recce pods equipped or if they are pointing in the right direction
 
 ## 2. Logistics
 This section covers only player logistics. For AI logistics see the supply AI mission in section 1.4
@@ -211,7 +256,7 @@ Available infrantry squads:
 |Ambush| Squad armed with rifles and RPGs that can be deployed anywhere on the battlefield. Can be used to intercept enemy convoys.|
 |Engineers| If deployed at a friendly zone, they will boost production speed, while reducing costs for anything built at the zone for a limited time.|
 |MANPADS| Squad armed with rifles for self protection and MANPADS, that can be deployed anywhere on the battlefield. Can be used to provide some protection from enemy aircraft or intercept enemy supply helicopters|
-|Spy| Spy disguised as an enemy soldier. If deployed to an enemy zone, will reveal its, and its neighbours, resources and production for 30 minutes.|
+|Spy| Spy disguised as an enemy soldier. If deployed to an enemy zone, will reveal its, and its neighbours, resources and production for 30 minutes, and will allow for Strike missions to be generated towards specific buildings in those zones.|
 |Rapier SAM| Small defensive SAM system. Can be deployed anywhere on the battlefield.|
 
 
@@ -290,6 +335,8 @@ Example:
 - Third crate dropped contains 0 supplies, aircraft still at 0 supplies
 
 Infantry squads can be deployed the same way. Each dropped crate will auto select one of the loaded infantry squads. You can prepare a specific squad manually using the `Other->Logistics->Loadmaster` option in the radio menu. After your prepared squad is dropped, the next one will be auto selected again, unless you prepare a new one.
+
+> Note: You do not need any additional scripts for the above to work, everything is included in the mission, you just need to add the aircraft slots. The Hercules cargo scripts that come with the module are only needed if you want to deploy the other units that are independent of Pretense.
 
 ## 3. Missions
 
@@ -372,9 +419,7 @@ Any member who dies or abandones their aircraft will be unassigned from the miss
 |Strike| Destroy either the specified number of structures at a zone, or a specific structure. Specific target missions are made available by completing Recon missions. | Any|
 |Deep Strike| Destroy a specific structure, deep behind enemy lines. Mission made available by completing Deep Recon missions | Any|
 |Runway Attack| Bomb runway at specified zone with minimum 5 bombs. Going above the required amount will increase the reward. Missiles and cluster bombs can not be used to complete this mission. | Any |
-|Recon (Fixed wing)| Fly over the specified zone. If multiple players are part of the same mission, all players need to be at the zone simultaneously for the objective to register. Can reveal targets for Strike missions. Will reveal the zones build and resource status on the map for a limited time. | Fixed wing |
-|Deep Recon(Fixed wing)| Fly over the specified zone, deep behind enemy lines. If multiple players are part of the same mission, all players need to be at the zone simultaneously for the objective to register. Can reveal targets for Deep Strike missions. Will reveal the zones build and resource status on the map for a limited time. | Fixed wing |
-|Recon (Helicopter)| Fly within range of the specified zone and stay within sight of as many enemy units as you can. Objective completes faster the more enemies from the zone are visible to you. Can reveal targets for Strike missions. Will reveal the zones build and resource status on the map for a limited time. | Any helicopter |
+|Recon| Perform Recon on a target zone using the Recon radio menu | Any|
 |Supply| Transport specified amount of resources to specified zone | Supply stransport capable aircraft [section 2.4](#24-compatible-aircraft)|
 |Escort| Escort specified friendly convoy on their way between zones. Objective is completed by spending the required time near the convoy, or if the convoy reaches its destination. | Any helicopter|
 |CSAR| Rescue a specified ejected pilot and bring them back to a friendly zone | Infantry transport capable aircraft [section 2.4](#24-compatible-aircraft)|
@@ -404,7 +449,7 @@ Only units that are currently alive are shown in this menu. It can happen that t
 
 Your stats can be accessed through the `Other->Information->Player` option in the radio menu.
 
-This contains your name, XP, CMD tokens, and rank.
+This contains your name, XP, CMD tokens, rank, and survival multiplier.
 
 ### 4.4 GCI menu
 
@@ -424,24 +469,30 @@ After a certain amount of XP you will rank up.
 
 Once you reach rank ``E-6`` you will have a chance to earn CMD tokens when you complete a mission. The higher your rank the better your chances.
 
-You can spend CMD tokens using the ``Command & Control`` radio menu. Once you buy an item, it will deduct the displayed number of CMD tokens from your account, and instructions will be displayed on how to use the bought item. For now, all options will direct you to open the radio menu again and select a target for your bought item from a menu of zones on the frontline.
+You can spend CMD tokens using the ``Command & Control`` radio menu. Once you buy an item, it will deduct the displayed number of CMD tokens from your account, and instructions will be displayed on how to use the bought item. In some cases you will be directed to open the radio menu again and select a target for your bought item from a menu of zones on the frontline.
 
 Available CMD items:
 
 |Item|Description|
 |:---:|:----|
-|Smoke markers|Will mark 5 enemies at the zone with red smoke|
-|JTAC|Will spawn a JTAC drone at the chosen zone that will lase enemies for you. Lasts 30 minutes or until the zone runs out of enemies|
-|Priority Zone|The selected zone will become a priority for your coalition. All AI missions will first target this zone if possible, and choose an alternative target if the selected one is not viable. You can use this to prioritize attacks on an enemy zone, captures on a neutral zone, and resupplys on a friendly zone. Lasts about 1 hour |
+|Smoke markers|Will mark 5 enemies at the zone with red smoke. Only works against zones that have their information revealed.|
+|JTAC|Will spawn a JTAC drone at the chosen zone that will lase enemies for you. Lasts 60 minutes or until the zone runs out of enemies, Reveals information of zone its deployed to.|
+|Priority Zone|The selected zone will become a priority for your coalition. All AI missions will first target this zone if possible, and choose an alternative target if the selected one is not viable. You can use this to prioritize attacks on an enemy zone, captures on a neutral zone, and resupplys on a friendly zone. Lasts about 2 hours |
 |Hack comms|Has a chance to reveal resources and production information of zones near the frontline(success rate 50%)|
 |Bribe officer|Has a chance to reveal resources and production on almost all enemy zones. (success rate 50%)|
+|Shell zone|Artillery will shell the enemy in the selected zone. Accuracy is improved against zones that have their information revealed|
+|Sabotage|Saboteurs will be sent to the selected zone to plant explosives at one of its buildings. (success rate 70%, improved if zone information is revealed)|
 
-The amount of XP earned can be increased by staying in the same aircraft for longer periods of time. After 10 minutes of flight time, an XP multiplier will start growing slowly from 1.0x up to 5.0x. The current value of the multiplier can be seen in the player information menu. This survival bonus is applied at the time the XP is earned. Switching to a different aircraft, or respawning for any reason will reset the multiplier.
+The amount of XP earned can be increased by staying in the same aircraft for longer periods of time. After 10 minutes of flight time, an XP multiplier will start growing slowly from 1.0x up to 5.0x. The current value of the multiplier can be seen in the player information menu. This survival bonus is applied at the time the XP is earned. 
+
+You can secure your multiplier by landing at a friendly zone and shutting down your engines. While the multiplier is secured, you can freely switch to a different aircraft or exit the game without reseting it to 1.0x. Taking off will remove the secure status. Switching to a different aircraft, or respawning for any reason while not secured will reset the multiplier. 
+
+Secured status can be verified with the `Other->Information->Player` option, where the `[SECURED]` label will be displayed next to the multiplier if secured.
 
 ## 6. Editing the mission to suit your needs
 
-
 - You can add any client aircraft you want anywhere on the map. Should you add it inside the borders of a zone, the slot will be blocked according to the state of the zone. No extra effort required on your part to make it work.
+- After adding new client slots, you can run the mission through my [Mass Waypoint Editor](https://github.com/Dzsek/DCSMassWaypointEdit) tool to ensure that the waypoints of all the newly added slots are synced to the waypoint template present in the mission.
 - Due to limitations with the DCS scripting API, multiple client aircraft in the same group are not supported. Please limit all slots to single aircraft groups, otherwise the radio menu and some other features will not work correctly.
 - You **can not** adjust difficulty by deleting AI aircraft from the mission editor. Doing so will result in script errors.
 - Logistics capable aircraft where categorized by what maked logical sense on what they can carry. In case you would like to enable logistics for other aircraft you can do so by adding a doScript action afther the scripts are loaded in the initialization trigger in the mission editor and overriding the values in there like this:
@@ -461,24 +512,99 @@ PlayerLogistics.allowedTypes['AH-64D_BLK_II'] = { supplies = false }
 ```
 - You only need to add the lines for the aircraft you want to change.
 
-- There is currently no easy way to adjust difficulty. The flow of the mission depends on many factors such as cost of AI groups, default build speeds, the flow of resources to each zone, the decision of each zone on what to build, a BattlefieldManager component that adds some variation to the default build speeds based on battlefield state, a randomized boost factor to build speeds to make either coalition occasionally push harder, and finally the behaviour of the DCS AI. It is unpredictable by nature, and any changes you make might have unexpected side effects. 
+- Player ranks, rank names, rewards and unlocks can be edited the same way as above by overriding the following values in another doScript action after the scripts are loaded in the initialization trigger:
+
+```lua
+    PlayerTracker.ranks[1] =  { rank=1,  name='E-1 Airman basic',           requiredXP = 0,        cmdChance = 0,       cmdAward=0,     cmdTrys=0}
+    PlayerTracker.ranks[2] =  { rank=2,  name='E-2 Airman',                 requiredXP = 2000,     cmdChance = 0,       cmdAward=0,     cmdTrys=0}
+    PlayerTracker.ranks[3] =  { rank=3,  name='E-3 Airman first class',     requiredXP = 4500,     cmdChance = 0,       cmdAward=0,     cmdTrys=0}
+    PlayerTracker.ranks[4] =  { rank=4,  name='E-4 Senior airman',          requiredXP = 7700,     cmdChance = 0,       cmdAward=0,     cmdTrys=0}
+    PlayerTracker.ranks[5] =  { rank=5,  name='E-5 Staff sergeant',         requiredXP = 11800,    cmdChance = 0.01,    cmdAward=1,     cmdTrys=1}
+    PlayerTracker.ranks[6] =  { rank=6,  name='E-6 Technical sergeant',     requiredXP = 17000,    cmdChance = 0.01,    cmdAward=5,     cmdTrys=10}
+    PlayerTracker.ranks[7] =  { rank=7,  name='E-7 Master sergeant',        requiredXP = 23500,    cmdChance = 0.03,    cmdAward=5,     cmdTrys=10}
+    PlayerTracker.ranks[8] =  { rank=8,  name='E-8 Senior master sergeant', requiredXP = 31500,    cmdChance = 0.06,    cmdAward=10,    cmdTrys=10}
+    PlayerTracker.ranks[9] =  { rank=9,  name='E-9 Chief master sergeant',  requiredXP = 42000,    cmdChance = 0.10,    cmdAward=10,    cmdTrys=10}
+    PlayerTracker.ranks[10] = { rank=10, name='O-1 Second lieutenant',      requiredXP = 52800,    cmdChance = 0.14,    cmdAward=20,    cmdTrys=15}
+    PlayerTracker.ranks[11] = { rank=11, name='O-2 First lieutenant',       requiredXP = 66500,    cmdChance = 0.20,    cmdAward=20,    cmdTrys=15}
+    PlayerTracker.ranks[12] = { rank=12, name='O-3 Captain',                requiredXP = 82500,    cmdChance = 0.27,    cmdAward=25,    cmdTrys=15, allowCarrierSupport=true}
+    PlayerTracker.ranks[13] = { rank=13, name='O-4 Major',                  requiredXP = 101000,   cmdChance = 0.34,    cmdAward=25,    cmdTrys=20, allowCarrierSupport=true}
+    PlayerTracker.ranks[14] = { rank=14, name='O-5 Lieutenant colonel',     requiredXP = 122200,   cmdChance = 0.43,    cmdAward=25,    cmdTrys=20, allowCarrierSupport=true}
+    PlayerTracker.ranks[15] = { rank=15, name='O-6 Colonel',                requiredXP = 146300,   cmdChance = 0.52,    cmdAward=30,    cmdTrys=20, allowCarrierSupport=true}
+    PlayerTracker.ranks[16] = { rank=16, name='O-7 Brigadier general',      requiredXP = 173500,   cmdChance = 0.63,    cmdAward=35,    cmdTrys=25, allowCarrierSupport=true, allowCarrierCommand=true}
+    PlayerTracker.ranks[17] = { rank=17, name='O-8 Major general',          requiredXP = 204000,   cmdChance = 0.74,    cmdAward=40,    cmdTrys=25, allowCarrierSupport=true, allowCarrierCommand=true}
+    PlayerTracker.ranks[18] = { rank=18, name='O-9 Lieutenant general',     requiredXP = 238000,   cmdChance = 0.87,    cmdAward=45,    cmdTrys=25, allowCarrierSupport=true, allowCarrierCommand=true}
+    PlayerTracker.ranks[19] = { rank=19, name='O-10 General',               requiredXP = 275700,   cmdChance = 0.95,    cmdAward=50,    cmdTrys=30, allowCarrierSupport=true, allowCarrierCommand=true}
+```
+
+- Player ranks use the following object format:
+  
+```lua
+    {
+        rank=19,                     -- rank number, needs to be the same as the index in the PlayerTracker.ranks table
+        name='O-10 General',         -- display name of the rank
+        requiredXP = 275700,         -- required xp to reach this rank
+        cmdChance = 0.95,            -- chance that a cmd point is awarded on each cmd roll
+        cmdAward=50,                 -- one time cmd points awarded when reaching this rank
+        cmdTrys=30,                  -- number of cmd rolls that happen each time a mission is completed, each roll has a 'cmdChance' chance of awarding a cmd point
+        allowCarrierSupport=true,    -- if true, players with this rank can access the carrier support menu
+        allowCarrierCommand=true     -- if true, players with this rank can access the carrier navigation menu
+    }
+```
+
+- There is currently no easy way to adjust difficulty. The flow of the mission depends on many factors such as cost of AI groups, default build speeds, the flow of resources to each zone, the decision of each zone on what to build, a BattlefieldManager component that adds some variation to the default build speeds based on battlefield state, a randomized boost factor to build speeds to make either coalition occasionally push harder, and finally the behaviour of the DCS AI. It is unpredictable by nature, and any changes you make might have unexpected side effects. Both sides use the same parameters by design and it is not possible to set them independently based on coalition.
 
 ## 6.1 Config
 
 You can override some values that have to do with balance by running the following code **before** any other scripts are loaded.
 ```lua
 Config = Config or {}
-Config.lossCompensation = 1.0 -- gives advantage to the side with less zones. Set to 0 to disable
+Config.lossCompensation = 1.1 -- gives advantage to the side with less zones. Set to 0 to disable
 Config.randomBoost = 0.0004 -- adds a random factor to build speeds that changes every 30 minutes, set to 0 to disable
 Config.buildSpeed = 10 -- structure and defense build speed (smaller number longer build times)
 Config.supplyBuildSpeed = 85 -- supply helicopters and convoys build speed (smaller number longer build times)
 Config.missionBuildSpeedReduction = 0.12 -- reduction of build speed in case of ai missions (smaller number longer build times)
-Config.maxDistFromFront = Config.maxDistFromFront or 129640 -- max distance in meters from front after which zone is forced into low activity state (export mode)
+Config.maxDistFromFront = 129640 -- max distance in meters from front after which zone is forced into low activity state (export mode)
 Config.restrictMissionAcceptance = true -- if set to true, missions can only be accepted while landed inside friendly zones
+
+-- specify how many of each mission type can be present at the same time on the mission board
+-- note that increasing the number of some of these can result in multiple missions getting generated against the same targets
+Config.missions = { 
+    ['cap_easy'] = 2,
+    ['cap_medium'] = 1,
+    ['tarcap'] = 1,
+    ['cas_easy'] = 2,
+    ['cas_medium'] = 1,
+    ['cas_hard'] = 1,
+    ['bai'] = 1,
+    ['sead'] = 3,
+    ['dead'] = 1,
+    ['strike_veryeasy'] = 2,
+    ['strike_easy'] = 1,
+    ['strike_medium'] = 3,
+    ['strike_hard'] = 1,
+    ['deep_strike'] = 3,
+    ['anti_runway'] = 2,
+    ['supply_easy'] = 3,
+    ['supply_hard'] = 1,
+    ['escort'] = 2,
+    ['csar'] = 1,
+    ['recon'] = 3,
+    ['extraction'] = 1,
+    ['deploy_squad'] = 3
+}
+
+Config.missionBoardSize = 15 -- sets how many missions can be on the mission board simultaneously, increasing this too much will cause the list to be too not fit on the screen anymore, and in extreme cases cause performance issues
+
+Config.carrierSpawnCost = 500 -- resource cost for carrier when players take off, set to 0 to disable restriction
+Config.zoneSpawnCost = 500 -- resource cost for zones when players take off, set to 0 to disable restriction
 ```
 
 You can paste this in a do script action that is run **before** the mission scripts. You can leave out the values you do not wish to change.
 I recommend only making small changes, only to one value at a time, and playing for a while to see how it feels.
+
+The values listed above are the defaults.
+
+You can add only the values that you want to change, but the first line (``Config = Config or {}``) always needs to be present.
 
 ## 6.2 Randomized start
 
@@ -531,9 +657,13 @@ Player stats, such as XP is stored in a separate file in the same location calle
 Additional (experimental) persistence can be enable by installing and configuring the [TimePersistence](https://github.com/Dzsek/TimePersistence) mod.
 All settings (time, weather, temperature, wind) are enabled by default. These can be configured by editing the properties of the ``props`` zone int the mission editor near Batumi in the south of Caucasus.
 
+> Note: This mod works exclusively in singleplayer.
+
 ## 8. Running the mission on a server
 
 ### 8.1 Slotblock
+
+> Note: As of version 1.6.5 slotblock.lua is no longer needed, and this chapter can be ignored.
 
 For players to be prevented from spawning at enemy zones, the included `slotblock.lua` file must be placed in your servers `C:\Users\<windows_username>\Saved Games\DCS.openbeta\Scripts\Hooks` folder, and the server restarted, in case it was already running at the time.
 
@@ -551,15 +681,7 @@ You can use the information in this file to export a mission status to a discord
 
 ## 9. Issue reporting
 
-If you find any bugs, issues, or you find the campaign does not work according to what is described in this manual, please report them on the Foothold Discord under  [#pretense-bug-reports](https://discord.com/channels/959044877470027848/1031459721313517578) channel. 
-
-Here's a [Discord invite](https://discord.gg/PtPsb9Mpk6) if you are not already a member.
-
-Try to include your dcs.log file and your Pretense save file into your bug report if possible.
-
-Please only report issues with unmodified versions of this campaign. I can't track down issues caused by modifications. Even if you modified a seemingly unrelated part, it can still cause problems in other unforseen ways.
-
-If you encounter issues with modified versions, your best bet is to either retrace your steps, or redownload the original version.
+:warning: Development and support of the project has been stopped.
 
 ### 9.1 Knows issues with 3rd party scripts
 
@@ -575,7 +697,10 @@ Most likely not, but cant hurt to try. The campaign is almost exclusively run fr
 
 ### 10.2 I've added the hercules mod, but airdropped units just disapear
 
-You need to add the Hercules airdrop script to the mission. It is not added by default.
+You need to add the Hercules airdrop script to the mission if you would like the normal airdrops to work, as these are not tracked by Pretense. It is not added by default. 
+Only Squads from the Logistics menu built into the mission are supported by default, without the need of extra scripts.
+
+You also need to install the Hercules mod server side if you are running Pretense on a server, so that the server is aware of the new payloads added by the mod.
 
 ### 10.3 I've added CTLD/Hercules script, but deployed units are not saved after the mission is restarted.
 
@@ -601,6 +726,67 @@ This is intentional, as FC3 aircraft can not be rearmed with the engines running
 
 I probably wont.
 If I will, I wont tell you about it unless it's close to release.
+
+### 10.9 I've cleared a zone but no AI is coming to capture it
+
+There can be several reasons why a zone does not instantly try to capture neighbouring zones.
+ - its supply groups are already deployed on different missions
+ - its unable to build supply missions due to the building needed to produce them being destroyed or not built yet
+ - it does not have enough resources to finish building the supply mission
+ - it is currently working on building something else
+
+Note that the AI will not always make the best and most optimal decission.
+
+### 10.10 Enemy units have spawned in the enemy zone while I was over it and promptly shot me down
+
+Each zone will deploy any defensive or offensive groups as soon as it finishes building them. It does not stop working just because their enemy is close. Try not to hang around too long over enemy zones. 
+
+Alternatively, complete recon missions, drop spies in enemy zones, or use the CMD options available to reveal what the enemy is working on and what their progress is, so you don't get caught off-guard. 
+
+If a zone is currently attempting to repair a damaged defensive group, destroying a unit of said group will reset the zones progress on repairing it.
+
+### 10.11 Why cant I rearm at this zone?
+
+Not every zone is setup as a FARP. Only zones that you can spawn at and zones that have airfields will allow you to rearm and refuel.
+Some static objects that serve as structures for the zones do have FARP in the name, but this alone does not mean the zone is setup as a FARP.
+
+### 10.12 I've added the UH-60L and/or Hercules mods to the mission but when I try loading anything from the logistics menu, it says doors are not open, even though they are.
+
+For this to work, the mod needs to be installed into the servers mod folder as well.
+The door states are detected by checking the animation values on the 3D model of the aircraft. 
+
+### 10.13 Will I lose my save if I update to the new version of the mission?
+
+Check the changelog starting from your current version up to the latest version. If any of the updates causes a save reset, it will be noted there.
+
+### 10.14 Can I tune the build speeds of the two sides independantly of eachother?
+
+No. Both coalitions use the same parameters by design.
+
+### 10.15 I have created a modified version of the mission. Can I update it to the latest version without loosing my changes?
+
+You can try unzipping the mission file and updating the scripts inside. A .miz file is just a renamed .zip file.
+That said I can not provide support for modified versions, so do so at your own risk.
+
+### 10.16 The warning about enabling persistence is ominous. Is it really ok to make this change?
+
+As of writing this (2024-Mar-21), I do not know of any DCS missions that abuse this, but I consider that you should be aware that the risk exists, even if it is minor.
+
+This change enables any mission running within DCS to read from and write to files on your PC. Many other missions use this method to provide persistence, as it is the only way to persist data outside of the play session.
+
+This inherently comes with the risk that running missions from unkown or dubious sources can allow them to malliciously access the data on your PC.
+
+If you have doubts about running a certain mission, you can always undo the change to the MissionScripting.lua file before running it, or verify that any scripts in the mission, whether embeded in the mission file or in a doscript trigger do not make questionable calls to functions of the io and lfs modules.
+
+Missions will still be limited to accessing only files that your DCS installation is allowed to access. Having appropriately set access rights within your OS can also protect you.
+
+Pretense only accesses the two save files mentioned in the persistence chapter (with a 3rd file used by the optional TimePersistence mod).
+
+### 10.17 Can I use your scripts to make my own mission?
+
+You can use and modify the mission, including the scripts for personal or private use.
+
+However, please respect the time and effort I've put into this and do not share modified versions, do not upload missions that use the scripts I've written for this mission, and do not charge money for access to anything that uses my work.
 
 ## 11. Changelog
 
@@ -951,3 +1137,107 @@ If I will, I wont tell you about it unless it's close to release.
 ### Syria V1.1.5 - 21 Dec 2023
 
 - Fixed unit category detection after latest change from ED which could cause script errors
+
+### Caucasus V1.4.6 - 27 Dec 2023
+
+- Fixed config menu not appearing for players of low rank
+- Fixed error when target of CSAR mission is killed
+
+### Syria Cold War V1.1.6 - 27 Dec 2023
+
+- Fixed config menu not appearing for players of low rank
+- Fixed error when target of CSAR mission is killed
+
+### Syria V1.1.6 - 27 Dec 2023
+
+- Fixed config menu not appearing for players of low rank
+- Fixed error when target of CSAR mission is killed
+
+### Pretense V1.5 - 29 Dec 2023
+
+>Note: Unified version numbers, changes from now on will refer to all Pretense missions, except if otherwise specified
+
+- Added new CMD options (Sabotage and artillery) (see [section 5](#5-player-xp-ranks-and-command-tokens))
+- You can now secure your survival bonus if you shut down your aircraft while landed at a friendly zone (see [section 5](#5-player-xp-ranks-and-command-tokens))
+
+### Pretense V1.5.1 - 5 Jan 2024
+
+- Command & Control menu moved to always be the last option in the radio menu
+- Reduced accuracy of Artillery CMD option
+- Fixed runway bombing mission progress not registering
+- Syria Cold War: removed SA-19 from SA-6 group
+
+### Pretense V1.5.2 - 13 Jan 2024
+
+- Spy squad can now generate Strike mission targets on successful completion of their mission
+- Increased size of mission board
+- Mission board size and mission availability can now be configured
+- Fixed another error during CSAR when pilot is killed
+- Rebalanced CMD earnings and costs
+- Increased priority zone CMD to 2 hours
+- Increased accuracy of Artillery CMD option
+
+### Pretense V1.6 - 21 Jan 2024
+
+> Note: This update will start a new mission save file, resetting your mission progress. The player profiles will remain unaffected.
+
+- Added Carriers
+
+### Pretense V1.6.1 - 22 Jan 2024
+
+- Replaced F-14s of Apex Flight with F/A-18s cause they were misbehaving
+- Split Harriers on Invincible into two separate flights
+- Limited Zone selection of CAP flights to near frontline to reduce clutter in radio menu
+- Tentative fix for error when updating state of AI aircraft
+- Fixed issue with activating multiple target menus at once generating wrong menus
+
+### Pretense v1.6.2 - 23 Jan 2024
+
+- Fixed error when assigning SEAD missions
+- Fixed issue with Harriers landing immediately after takeoff from carrier
+
+### Pretense v1.6.3 - 31 Jan 2024
+
+- Fixed script error on Hercules cargo drop collision
+- Fixed carrier stop command not being applied when reaching a goto waypoint
+- Fixed Nova flight on Caucasus not spawning on LHA
+- Fixed missing waypoints from kneeboards
+
+### Pretense v1.6.4 - 03 Feb 2024
+
+- Reduced max supply of carriers
+- Added resource cost to taking off from zones similar to carriers (configurable)
+- Caucausus: added spawnzones to Zugdidi to avoid units spawning inside map objects
+- Fixed naval command menu duplicating for players with rank 0
+- Syria (both): moved El Taebah convoys farther from intersection to decrease chances of getting stuck on spawn
+- Strike targets revealed by recon missions and spies now persist between restarts
+- Fixed JTAC not retargeting automatically on destruction of target
+
+### Pretense v1.6.5 - 04 Feb 2024
+
+- Fixed error on restoring strike targets
+- Block slots from within the mission, removing the need for slotblock.lua
+
+### Pretense v1.7 - 11 Feb 2024
+
+- Recon can now be performed independently from a mission using the new Recon menu (see [section 1.9](#19-recon))
+- Artillery accuracy improved against zones that have their information revealed
+- Sabotage CMD option now has a 100% chance of success against zones that have their information revealed
+- JTAC now reveals information of zone its deployed to
+- Increased cost of JTAC CMD
+- Strike support can now only be called in on zones that have their information revealed
+- Added cruise missile strike support option for compatible naval groups
+- Assault convoys now have a small chance of deploying ambush and manpads squads somewhere along their route (valid for both coalitions)
+- Naval groups now have persistence on a member level, if main ship is destroyed, interaction with naval group will be disabled for the rest of the campaign
+
+> Note: Cruise missiles will only be available for campaigns started on v1.7 or newer
+
+### Pretense v1.7.1 - 23 Feb 2024
+
+- Target smoke CMD now only available on revealed zones
+- Fixed tanker speed defined in knots instead of m/s leading to high orbit speeds
+- Temporary fix to restore old Group.getByName behaviour
+
+### Pretense v1.7.2 - 23 Feb 2024
+
+- Fixed occasional script error when saving zone groups
