@@ -6886,7 +6886,7 @@ do
 			param.context.boostScale[2] = param.context.boostScale[2] + bluep
 
 			--limit to numbers above 0
-			param.context.boostScale[1] = math.max(0.5,param.context.boostScale[1]) -- Edited, limit red side minimun boostScale to 0.5, default = 0.01
+			param.context.boostScale[1] = math.max(0.1,param.context.boostScale[1]) -- Edited, limit red side minimun boostScale, default = 0.01
 			param.context.boostScale[2] = math.max(0.01,param.context.boostScale[2])
 
 			env.info('BattlefieldManager - power red = '..param.context.boostScale[1])
@@ -7179,7 +7179,7 @@ do
                 env.info('PlayerTracker - '..player..' checking if landed: '..tostring(isLanded))
 
                 if isLanded then
-                    if zn and zn.isCarrier then -- Edited, fix nil issue
+                    if zn and zn.isCarrier then -- Edited, fix nil issue, default = zn.isCarrier
                         zn:addResource(Config.carrierSpawnCost)
                     else
                         zn:addResource(Config.zoneSpawnCost)
