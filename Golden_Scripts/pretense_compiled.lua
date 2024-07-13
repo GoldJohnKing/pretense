@@ -2482,7 +2482,7 @@ do
 		
 		if group.state =='takeoff' then
 			if timer.getAbsTime() - group.lastStateTime > GroupMonitor.blockedDespawnTime then
-				if gr and gr:getSize()>0 and gr:getUnit(1):isExist() then
+				if gr and gr:getSize()>0 and gr:getUnit(1) and gr:getUnit(1):isExist() then -- Edited, fix nil issue, default = gr and gr:getSize()>0 and gr:getUnit(1):isExist()
 					local frUnit = gr:getUnit(1)
 					local cz = CarrierCommand.getCarrierOfUnit(frUnit:getName())
 					if Utils.allGroupIsLanded(gr, cz ~= nil) then
